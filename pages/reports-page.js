@@ -635,15 +635,18 @@ export async function renderReportsPage(container, userData) {
                 <th rowspan="3" class="border border-gray-300 px-1 py-2 text-center align-middle text-[11px] font-bold" style="min-width: 40px; width: 40px;">เลขที่</th>
                 <th rowspan="3" class="border border-gray-300 px-1 py-2 text-center align-middle text-[11px] font-bold" style="min-width: 70px; width: 70px;">เลขประจำตัว</th>
                 <th rowspan="3" class="border border-gray-300 px-3 py-2 text-left align-middle text-[11px] font-bold" style="min-width: 200px; width: 200px;">ชื่อ-สกุล</th>
+                <th class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold" style="min-width: 50px; width: 50px;">เดือน</th>
                 ${monthSpans.map(m => `<th colspan="${m.span}" class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold">${m.value || ''}</th>`).join('')}
                 <th rowspan="3" class="border border-gray-300 px-1 py-2 text-center align-middle text-[11px] font-bold" style="min-width: 45px; width: 45px;">รวม<br><span class="text-[9px] font-normal">${C}</span></th>
               </tr>
               <!-- Row 2: Date -->
               <tr class="bg-gray-50/70 text-gray-700 font-bold border-b border-gray-300">
+                <th class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold">วันที่</th>
                 ${dateSpans.map(d => `<th colspan="${d.span}" class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold">${d.value || ''}</th>`).join('')}
               </tr>
               <!-- Row 3: Period -->
               <tr class="bg-gray-50/70 text-gray-700 font-bold border-b border-gray-300">
+                <th class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold">คาบ</th>
                 ${periodNumbers.map(p => `<th class="border border-gray-300 px-0.5 py-1 text-center text-[9px] font-mono font-medium" style="min-width: 16px; width: 16px;">${p}</th>`).join('')}
               </tr>
             </thead>
@@ -667,6 +670,8 @@ export async function renderReportsPage(container, userData) {
                     <td class="border border-gray-300 px-1 py-1.5 text-center font-mono text-[10px]">${s.number || sIdx + 1}</td>
                     <td class="border border-gray-300 px-1 py-1.5 text-center font-mono text-[10px] text-gray-500">${s.studentCode || '-'}</td>
                     <td class="border border-gray-300 px-3 py-1.5 text-left font-medium text-[11px] text-gray-800 text-left-print">${s.prefix ? s.prefix + ' ' : ''}${s.firstName} ${s.lastName}</td>
+                    <!-- Spacer col under คาบ label -->
+                    <td class="border border-gray-300 p-0 bg-gray-50/30"></td>
                     ${cellHTMLs.join('')}
                     <!-- Total column for student -->
                     <td class="border border-gray-300 px-1 py-1.5 text-center font-bold text-[10px] bg-gray-50/50">${studentPresentCount}</td>
@@ -678,6 +683,8 @@ export async function renderReportsPage(container, userData) {
               <!-- Bottom Row: Totals for each period -->
               <tr class="bg-gray-50/70 font-bold text-gray-700">
                 <td colspan="3" class="border border-gray-300 px-3 py-2 text-center text-[10px] font-bold">รวม</td>
+                <!-- Spacer col under คาบ label -->
+                <td class="border border-gray-300 p-0"></td>
                 ${periodNumbers.map(p => {
                   const hasRecord = Math.floor((p - 1) / periodsPerSession) < records.length;
                   let sum = 0;
