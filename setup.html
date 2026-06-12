@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Setup Admin — โรงเรียนเบญจมราชรังสฤษฎิ์ ๒</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>* { font-family: 'Inter','Noto Sans Thai',sans-serif; }</style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-900 to-indigo-900 flex items-center justify-center p-4">
+
+<div class="w-full max-w-md bg-white/10 backdrop-blur border border-white/20 rounded-3xl p-8 shadow-2xl text-white space-y-6">
+
+  <div class="text-center">
+    <div class="text-5xl mb-3">🔐</div>
+    <h1 class="text-2xl font-bold">สร้างบัญชี Admin</h1>
+    <p class="text-indigo-300 text-sm mt-1">โรงเรียนเบญจมราชรังสฤษฎิ์ ๒ — One-time Setup</p>
+  </div>
+
+  <div id="status" class="hidden p-4 rounded-xl text-sm font-medium"></div>
+
+  <div class="space-y-3">
+    <div>
+      <label class="block text-xs font-semibold text-indigo-200 mb-1.5">อีเมล Admin</label>
+      <input id="inp-email" type="email" value="admin@admin.com"
+        class="w-full bg-white/10 border border-white/20 text-white placeholder-indigo-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-white/30"/>
+    </div>
+    <div>
+      <label class="block text-xs font-semibold text-indigo-200 mb-1.5">รหัสผ่าน</label>
+      <input id="inp-password" type="text" value="10819027"
+        class="w-full bg-white/10 border border-white/20 text-white placeholder-indigo-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-white/30 font-mono"/>
+    </div>
+    <div>
+      <label class="block text-xs font-semibold text-indigo-200 mb-1.5">ชื่อแสดง</label>
+      <input id="inp-name" type="text" value="ผู้ดูแลระบบ"
+        class="w-full bg-white/10 border border-white/20 text-white placeholder-indigo-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-white/30"/>
+    </div>
+  </div>
+
+  <button id="btn-create"
+    class="w-full py-3.5 rounded-xl bg-white text-indigo-800 font-bold text-sm hover:bg-indigo-50 transition shadow-lg active:scale-95">
+    ✨ สร้างบัญชี Admin
+  </button>
+
+  <div id="result-box" class="hidden space-y-3">
+    <div class="h-px bg-white/20"></div>
+    <div class="bg-green-500/20 border border-green-400/30 rounded-xl p-4 space-y-2 text-sm">
+      <div class="font-bold text-green-300">✅ สร้างสำเร็จแล้ว!</div>
+      <div class="text-green-200">อีเมล: <span id="res-email" class="font-mono font-bold"></span></div>
+      <div class="text-green-200">รหัสผ่าน: <span id="res-pass" class="font-mono font-bold"></span></div>
+      <div class="text-green-200">UID: <span id="res-uid" class="font-mono text-xs break-all"></span></div>
+    </div>
+    <a href="index.html"
+      class="block w-full py-3 rounded-xl bg-indigo-600 text-white font-bold text-sm text-center hover:bg-indigo-700 transition shadow-lg">
+      🚀 ไปหน้า Login
+    </a>
+    <p class="text-xs text-indigo-300 text-center">⚠️ ลบหรือปิดไฟล์ setup.html นี้หลังตั้งค่าเสร็จ</p>
+  </div>
+
+</div>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
+  import { getAuth, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword }
+    from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
+  import { getFirestore, doc, setDoc, getDoc, Timestamp }
+    from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDuRDNQMJ46BC3Hhpq65CKsE1QepLk-Rfk",
+    authDomain: "student-d7865.firebaseapp.com",
+    projectId: "student-d7865",
+    storageBucket: "student-d7865.firebasestorage.app",
+    messagingSenderId: "776316970579",
+    appId: "1:776316970579:web:599a65cd85a3be8a57c8a6",
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  function showStatus(msg, type = 'info') {
+    const el = document.getElementById('status');
+    el.className = `p-4 rounded-xl text-sm font-medium ${
+      type === 'error'   ? 'bg-red-500/20 border border-red-400/30 text-red-200' :
+      type === 'success' ? 'bg-green-500/20 border border-green-400/30 text-green-200' :
+                           'bg-blue-500/20 border border-blue-400/30 text-blue-200'
+    }`;
+    el.textContent = msg;
+    el.classList.remove('hidden');
+  }
+
+  document.getElementById('btn-create').onclick = async () => {
+    const email    = document.getElementById('inp-email').value.trim();
+    const password = document.getElementById('inp-password').value.trim();
+    const name     = document.getElementById('inp-name').value.trim();
+
+    if (!email || !password) return showStatus('กรุณากรอกอีเมลและรหัสผ่าน', 'error');
+    if (password.length < 6)  return showStatus('รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร', 'error');
+
+    const btn = document.getElementById('btn-create');
+    btn.disabled = true;
+    btn.textContent = '⏳ กำลังสร้างบัญชี...';
+    document.getElementById('status').classList.add('hidden');
+
+    try {
+      let uid;
+
+      // ลองสร้าง user ใหม่ก่อน
+      try {
+        showStatus('กำลังสร้างบัญชีใหม่...', 'info');
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(cred.user, { displayName: name });
+        uid = cred.user.uid;
+      } catch (err) {
+        // ถ้าอีเมลมีอยู่แล้ว ให้ Login แล้ว set role
+        if (err.code === 'auth/email-already-in-use') {
+          showStatus('พบบัญชีนี้แล้ว กำลัง Login และอัปเดต Role เป็น Admin...', 'info');
+          const cred = await signInWithEmailAndPassword(auth, email, password);
+          uid = cred.user.uid;
+        } else throw err;
+      }
+
+      // บันทึก/อัปเดต Role ใน Firestore
+      await setDoc(doc(db, 'users', uid), {
+        displayName: name,
+        email:       email,
+        role:        'admin',
+        createdAt:   Timestamp.now(),
+      }, { merge: true });
+
+      // แสดงผลสำเร็จ
+      document.getElementById('res-email').textContent = email;
+      document.getElementById('res-pass').textContent  = password;
+      document.getElementById('res-uid').textContent   = uid;
+      document.getElementById('result-box').classList.remove('hidden');
+      showStatus('✅ สร้างบัญชี Admin เรียบร้อยแล้ว!', 'success');
+
+    } catch (e) {
+      const msgs = {
+        'auth/weak-password':       'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร',
+        'auth/invalid-email':       'รูปแบบอีเมลไม่ถูกต้อง',
+        'auth/wrong-password':      'รหัสผ่านไม่ถูกต้องสำหรับบัญชีที่มีอยู่',
+        'auth/too-many-requests':   'ลองบ่อยเกินไป กรุณารอสักครู่',
+      };
+      showStatus((msgs[e.code] || e.message), 'error');
+      btn.disabled = false;
+      btn.textContent = '✨ สร้างบัญชี Admin';
+    }
+  };
+</script>
+</body>
+</html>

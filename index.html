@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="ระบบบริหารจัดการสถานศึกษา — จัดการข้อมูลนักเรียน เช็คชื่อ ความประพฤติ และรายงาน"/>
+  <title>โรงเรียนเบญจมราชรังสฤษฎิ์ ๒ — ระบบบริหารจัดการสถานศึกษา</title>
+
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'Noto Sans Thai', 'sans-serif'] },
+          animation: {
+            'scale-in': 'scaleIn 0.15s ease-out',
+            'fade-in':  'fadeIn 0.2s ease-out',
+            'slide-in': 'slideIn 0.25s ease-out',
+          },
+          keyframes: {
+            scaleIn:  { '0%': { transform: 'scale(0.95)', opacity: '0' }, '100%': { transform: 'scale(1)', opacity: '1' } },
+            fadeIn:   { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+            slideIn:  { '0%': { transform: 'translateX(-20px)', opacity: '0' }, '100%': { transform: 'translateX(0)', opacity: '1' } },
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    * { font-family: 'Inter', 'Noto Sans Thai', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+    .animate-scale-in { animation: scaleIn 0.15s ease-out; }
+    @keyframes scaleIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+    /* Sidebar gradient */
+    #sidebar { background: linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #1e40af 100%); }
+    /* Visible custom scrollbar */
+    .custom-scrollbar::-webkit-scrollbar { height: 4px; display: block; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="min-h-full bg-gray-50 text-gray-900 overflow-y-auto">
+
+<!-- ═══════════════════════════════════════════════════════
+     LOADING PAGE (Initial State)
+═══════════════════════════════════════════════════════ -->
+<div id="layout-loading" class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+  style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e3a8a 100%)">
+  <div class="flex flex-col items-center gap-4 z-10">
+    <div class="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
+    <div class="text-white/80 font-medium text-sm animate-pulse">กำลังตรวจสอบสิทธิ์...</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     LOGIN PAGE
+═══════════════════════════════════════════════════════ -->
+<div id="layout-login" class="hidden min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+  style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e3a8a 100%)">
+
+  <!-- Background decoration -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-white/5 blur-3xl"></div>
+    <div class="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-blue-500/10 blur-3xl"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-indigo-500/5 border border-white/5"></div>
+  </div>
+
+  <div class="relative w-full max-w-md">
+    <!-- Logo & Brand -->
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center mx-auto mb-4 shadow-2xl border border-white/20">
+        <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+        </svg>
+      </div>
+      <h1 class="text-3xl font-extrabold text-white tracking-tight">โรงเรียนเบญจมราชรังสฤษฎิ์ ๒</h1>
+      <p class="text-indigo-300 text-sm mt-1">ระบบบริหารจัดการสถานศึกษา</p>
+    </div>
+
+    <!-- Login Card -->
+    <div class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 shadow-2xl">
+      <h2 class="text-white font-bold text-xl mb-6">เข้าสู่ระบบ</h2>
+
+      <form id="login-form" class="space-y-4">
+        <!-- Error -->
+        <div id="login-error" class="hidden bg-red-500/20 border border-red-400/30 text-red-200 text-sm rounded-xl px-4 py-3"></div>
+
+        <div>
+          <label class="block text-sm font-medium text-indigo-200 mb-1.5">อีเมล</label>
+          <div class="relative">
+            <input id="login-email" type="email" autocomplete="email" required
+              placeholder="your@email.com"
+              class="w-full bg-white/10 border border-white/20 text-white placeholder-indigo-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/40 transition"/>
+            <svg class="absolute right-3 top-3.5 w-4 h-4 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
+            </svg>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-indigo-200 mb-1.5">รหัสผ่าน</label>
+          <div class="relative">
+            <input id="login-password" type="password" autocomplete="current-password" required
+              placeholder="••••••••"
+              class="w-full bg-white/10 border border-white/20 text-white placeholder-indigo-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/40 transition"/>
+            <svg class="absolute right-3 top-3.5 w-4 h-4 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </div>
+        </div>
+
+        <button id="login-btn" type="submit"
+          class="w-full py-3.5 rounded-xl bg-white text-indigo-800 font-bold text-sm hover:bg-indigo-50 transition-all shadow-lg hover:shadow-xl active:scale-95 mt-2">
+          เข้าสู่ระบบ
+        </button>
+      </form>
+
+      <!-- Divider -->
+      <div class="flex items-center gap-3 my-5">
+        <div class="flex-1 h-px bg-white/15"></div>
+        <span class="text-indigo-300 text-xs font-medium">หรือ</span>
+        <div class="flex-1 h-px bg-white/15"></div>
+      </div>
+
+      <!-- Google Sign-In -->
+      <button id="btn-google-login"
+        class="w-full flex items-center justify-center gap-3 py-3.5 rounded-xl bg-white text-gray-700 font-semibold text-sm
+               hover:bg-gray-50 transition-all shadow-lg hover:shadow-xl active:scale-95 border border-gray-200">
+        <!-- Google Logo SVG -->
+        <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        เข้าสู่ระบบด้วย Google
+      </button>
+
+      <!-- Role hint -->
+      <div class="mt-6 pt-5 border-t border-white/10">
+        <p class="text-xs text-indigo-300 text-center mb-3">สิทธิ์ผู้ใช้งาน</p>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="bg-purple-500/20 rounded-lg px-3 py-2 text-center">
+            <div class="text-xs font-semibold text-purple-200">Admin</div>
+            <div class="text-xs text-purple-300 mt-0.5">คุมทั้งหมด</div>
+          </div>
+          <div class="bg-indigo-500/20 rounded-lg px-3 py-2 text-center">
+            <div class="text-xs font-semibold text-indigo-200">ครูประจำชั้น</div>
+            <div class="text-xs text-indigo-300 mt-0.5">ดูแลห้องเรียน</div>
+          </div>
+          <div class="bg-teal-500/20 rounded-lg px-3 py-2 text-center">
+            <div class="text-xs font-semibold text-teal-200">ครูประจำวิชา</div>
+            <div class="text-xs text-teal-300 mt-0.5">เช็ครายวิชา</div>
+          </div>
+          <div class="bg-orange-500/20 rounded-lg px-3 py-2 text-center">
+            <div class="text-xs font-semibold text-orange-200">ผู้ปกครอง</div>
+            <div class="text-xs text-orange-300 mt-0.5">ดูข้อมูลลูก</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-center text-indigo-400 text-xs mt-6">โรงเรียนเบญจมราชรังสฤษฎิ์ ๒ v1.0 · Powered by Firebase</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MAIN APP LAYOUT
+═══════════════════════════════════════════════════════ -->
+<div id="layout-app" class="hidden min-h-[100dvh] flex">
+
+  <!-- Mobile Overlay -->
+  <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/50 z-30 lg:hidden"></div>
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside id="sidebar"
+    class="fixed lg:relative z-40 flex flex-col w-64 h-full transition-all duration-300 -translate-x-full lg:translate-x-0 flex-shrink-0">
+
+    <!-- Brand -->
+    <div class="flex items-center gap-3 px-5 py-5 border-b border-white/10">
+      <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center flex-shrink-0">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+        </svg>
+      </div>
+      <span id="brand-text" class="text-white font-bold text-base">โรงเรียนเบญจมราชรังสฤษฎิ์ ๒</span>
+      <button id="btn-collapse" class="ml-auto text-white/40 hover:text-white/70 transition hidden lg:block">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+      </button>
+    </div>
+
+    <!-- User info -->
+    <div id="sidebar-user-info" class="px-4 py-4 border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <div id="sidebar-avatar" class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">U</div>
+        <div class="min-w-0">
+          <div id="sidebar-username" class="text-white text-sm font-semibold truncate"></div>
+          <div id="sidebar-role" class="text-indigo-300 text-xs truncate"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="sidebar-nav" class="flex-1 px-3 py-4 space-y-1 overflow-y-auto"></nav>
+
+    <!-- Logout -->
+    <div class="px-3 py-4 border-t border-white/10">
+      <button id="btn-logout"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/10 transition-all">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+        <span class="nav-label">ออกจากระบบ</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN CONTENT ─── -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    <!-- Top Bar -->
+    <header class="flex-shrink-0 bg-white border-b border-gray-100 px-4 sm:px-6 py-4 flex items-center gap-4 shadow-sm">
+      <!-- Mobile menu toggle -->
+      <button id="btn-menu" class="lg:hidden p-2 rounded-xl text-gray-500 hover:bg-gray-100 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+
+      <h1 id="page-title" class="text-lg font-bold text-gray-800"></h1>
+
+      <div class="ml-auto flex items-center gap-3">
+        <!-- Current date -->
+        <span id="header-date" class="hidden sm:block text-sm text-gray-400"></span>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main id="app-content" class="flex-1 p-4 sm:p-6 lg:p-8">
+      <!-- Filled by router -->
+    </main>
+  </div>
+</div>
+
+<script>
+  // Update date
+  (function() {
+    const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    const d = new Date();
+    const el = document.getElementById('header-date');
+    if (el) el.textContent = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear() + 543}`;
+  })();
+</script>
+
+<!-- App Entry Point (ES Module) -->
+<script type="module" src="app.js?v=1.3"></script>
+</body>
+</html>
