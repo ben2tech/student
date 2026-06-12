@@ -647,7 +647,7 @@ export async function renderReportsPage(container, userData) {
               <!-- Row 3: Period -->
               <tr class="bg-gray-50/70 text-gray-700 font-bold border-b border-gray-300">
                 <th class="border border-gray-300 px-2 py-1 text-center text-[10px] font-bold whitespace-nowrap" style="width: 1%;">คาบ</th>
-                ${periodNumbers.map(p => `<th class="border border-gray-300 px-0.5 py-1 text-center text-[9px] font-mono font-medium whitespace-nowrap" style="width: 1%;">${p}</th>`).join('')}
+                ${periodNumbers.map(p => `<th class="border border-gray-300 px-0 py-1 text-center text-[9px] font-mono font-medium" style="width: 18px; min-width: 18px; max-width: 18px;">${p}</th>`).join('')}
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
@@ -662,7 +662,7 @@ export async function renderReportsPage(container, userData) {
                   }
                   const symbol = getStatusSymbol(status);
                   const cellStyle = getStatusStyle(status);
-                  cellHTMLs.push(`<td class="border border-gray-300 p-0 text-center font-mono text-[10px] ${cellStyle}">${symbol}</td>`);
+                  cellHTMLs.push(`<td class="border border-gray-300 p-0 text-center font-mono text-[10px] ${cellStyle}" style="width: 18px; min-width: 18px; max-width: 18px;">${symbol}</td>`);
                 }
 
                 return `
@@ -689,7 +689,7 @@ export async function renderReportsPage(container, userData) {
                       if (status === 'present' || status === 'late') sum++;
                     });
                   }
-                  return `<td class="border border-gray-300 px-0.5 py-2 text-center font-mono text-[10px]">${hasRecord ? sum : ''}</td>`;
+                  return `<td class="border border-gray-300 px-0 py-2 text-center font-mono text-[10px]" style="width: 18px; min-width: 18px; max-width: 18px;">${hasRecord ? sum : ''}</td>`;
                 }).join('')}
                 <!-- Bottom right cell -->
                 <td class="border border-gray-300 px-1 py-2 text-center font-bold bg-gray-50/70"></td>
