@@ -669,7 +669,7 @@ export async function renderReportsPage(container, userData) {
                   <tr class="hover:bg-gray-50/50 text-gray-700">
                     <td class="border border-gray-300 px-1 py-1.5 text-center font-mono text-[10px]">${s.number || sIdx + 1}</td>
                     <td class="border border-gray-300 px-1 py-1.5 text-center font-mono text-[10px] text-gray-500">${s.studentCode || '-'}</td>
-                    <td colspan="2" class="border border-gray-300 px-3 py-1.5 text-left font-medium text-[11px] text-gray-800 text-left-print whitespace-nowrap">${s.prefix ? s.prefix + ' ' : ''}${s.firstName} ${s.lastName}</td>
+                    <td colspan="2" class="border border-gray-300 px-3 py-1.5 text-left font-medium text-[11px] text-gray-800 text-left-print whitespace-nowrap">${s.prefix ? s.prefix : ''}${s.firstName} ${s.lastName}</td>
                     ${cellHTMLs.join('')}
                     <td class="border border-gray-300 px-1 py-1.5 text-center font-bold text-[10px] bg-gray-50/50">${studentPresentCount}</td>
                   </tr>
