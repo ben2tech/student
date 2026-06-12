@@ -628,13 +628,13 @@ export async function renderReportsPage(container, userData) {
 
         <!-- Scroll container for web, no scroll for print -->
         <div class="overflow-x-auto custom-scrollbar -mx-6 px-6">
-          <table class="w-full border-collapse border border-gray-300 text-xs">
+          <table class="w-max border-collapse border border-gray-300 text-xs">
             <thead>
               <!-- Row 1: Month -->
               <tr class="bg-gray-50/70 text-gray-700 font-bold border-b border-gray-300">
                 <th rowspan="3" class="border border-gray-300 px-1 py-2 text-center align-middle text-[11px] font-bold whitespace-nowrap" style="width: 1%;">เลขที่</th>
                 <th rowspan="3" class="border border-gray-300 px-1 py-2 text-center align-middle text-[11px] font-bold" style="width: 1%; white-space: nowrap;">เลข<br>ประจำตัว</th>
-                <th rowspan="3" class="border border-gray-300 px-3 py-2 text-left align-middle text-[11px] font-bold whitespace-nowrap">ชื่อ-สกุล</th>
+                <th rowspan="3" class="border border-gray-300 px-3 py-2 text-left align-middle text-[11px] font-bold whitespace-nowrap" style="width: 1%;">ชื่อ-สกุล</th>
                 <th class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold whitespace-nowrap" style="width: 1%;">เดือน</th>
                 ${monthSpans.map(m => `<th colspan="${m.span}" class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold">${m.value || ''}</th>`).join('')}
                 <th rowspan="3" class="border border-gray-300 px-1 py-2 text-center align-middle text-[11px] font-bold whitespace-nowrap" style="width: 1%;">รวม<br><span class="text-[9px] font-normal">${C}</span></th>
