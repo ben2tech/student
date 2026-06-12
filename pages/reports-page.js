@@ -635,18 +635,18 @@ export async function renderReportsPage(container, userData) {
                 <th rowspan="3" class="border border-gray-300 px-1 py-2 text-center align-middle text-[11px] font-bold" style="min-width: 40px; width: 40px;">เลขที่</th>
                 <th rowspan="3" class="border border-gray-300 px-1 py-2 text-center align-middle text-[11px] font-bold" style="min-width: 70px; width: 70px;">เลขประจำตัว</th>
                 <th rowspan="3" class="border border-gray-300 px-3 py-2 text-left align-middle text-[11px] font-bold whitespace-nowrap" style="width: 1%;">ชื่อ-สกุล</th>
-                <th class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold" style="min-width: 50px; width: 50px;">เดือน</th>
+                <th class="border border-gray-300 px-2 py-1 text-center text-[10px] font-bold whitespace-nowrap" style="width: 1%;">เดือน</th>
                 ${monthSpans.map(m => `<th colspan="${m.span}" class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold">${m.value || ''}</th>`).join('')}
                 <th rowspan="3" class="border border-gray-300 px-1 py-2 text-center align-middle text-[11px] font-bold" style="min-width: 45px; width: 45px;">รวม<br><span class="text-[9px] font-normal">${C}</span></th>
               </tr>
               <!-- Row 2: Date -->
               <tr class="bg-gray-50/70 text-gray-700 font-bold border-b border-gray-300">
-                <th class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold">วันที่</th>
+                <th class="border border-gray-300 px-2 py-1 text-center text-[10px] font-bold whitespace-nowrap" style="width: 1%;">วันที่</th>
                 ${dateSpans.map(d => `<th colspan="${d.span}" class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold">${d.value || ''}</th>`).join('')}
               </tr>
               <!-- Row 3: Period -->
               <tr class="bg-gray-50/70 text-gray-700 font-bold border-b border-gray-300">
-                <th class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold">คาบ</th>
+                <th class="border border-gray-300 px-2 py-1 text-center text-[10px] font-bold whitespace-nowrap" style="width: 1%;">คาบ</th>
                 ${periodNumbers.map(p => `<th class="border border-gray-300 px-0.5 py-1 text-center text-[9px] font-mono font-medium" style="min-width: 16px; width: 16px;">${p}</th>`).join('')}
               </tr>
             </thead>
