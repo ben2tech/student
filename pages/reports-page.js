@@ -634,19 +634,19 @@ export async function renderReportsPage(container, userData) {
               <tr class="bg-gray-50/70 text-gray-700 font-bold border-b border-gray-300">
                 <th rowspan="3" class="border border-gray-300 px-1 py-2 text-center align-middle text-[11px] font-bold whitespace-nowrap" style="width: 1%;">เลขที่</th>
                 <th rowspan="3" class="border border-gray-300 px-1 py-2 text-center align-middle text-[11px] font-bold" style="width: 1%; white-space: nowrap;">เลข<br>ประจำตัว</th>
-                <th rowspan="3" class="border border-gray-300 px-3 py-2 text-left align-middle text-[11px] font-bold whitespace-nowrap">ชื่อ-สกุล</th>
-                <th class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold whitespace-nowrap" style="width: 1%;">เดือน</th>
+                <th rowspan="3" class="border border-gray-300 px-3 py-2 text-left align-middle text-[11px] font-bold whitespace-nowrap" style="width: 1%;">ชื่อ-สกุล</th>
+                <th class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold whitespace-nowrap" style="width: 30px; min-width: 30px; max-width: 30px;">เดือน</th>
                 ${monthSpans.map(m => `<th colspan="${m.span}" class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold">${m.value || ''}</th>`).join('')}
                 <th rowspan="3" class="border border-gray-300 px-1 py-2 text-center align-middle text-[11px] font-bold whitespace-nowrap" style="width: 1%;">รวม<br><span class="text-[9px] font-normal">${C}</span></th>
               </tr>
               <!-- Row 2: Date -->
               <tr class="bg-gray-50/70 text-gray-700 font-bold border-b border-gray-300">
-                <th class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold whitespace-nowrap" style="width: 1%;">วันที่</th>
+                <th class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold whitespace-nowrap" style="width: 30px; min-width: 30px; max-width: 30px;">วันที่</th>
                 ${dateSpans.map(d => `<th colspan="${d.span}" class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold">${d.value || ''}</th>`).join('')}
               </tr>
               <!-- Row 3: Period -->
               <tr class="bg-gray-50/70 text-gray-700 font-bold border-b border-gray-300">
-                <th class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold whitespace-nowrap" style="width: 1%;">คาบ</th>
+                <th class="border border-gray-300 px-1 py-1 text-center text-[10px] font-bold whitespace-nowrap" style="width: 30px; min-width: 30px; max-width: 30px;">คาบ</th>
                 ${periodNumbers.map(p => `<th class="border border-gray-300 px-0 py-1 text-center text-[9px] font-mono font-medium" style="width: 18px; min-width: 18px; max-width: 18px;">${p}</th>`).join('')}
               </tr>
             </thead>
