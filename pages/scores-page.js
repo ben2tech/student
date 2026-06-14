@@ -223,14 +223,16 @@ export async function renderScoresPage(container, userData) {
           <td class="px-2 py-2 text-center"><input ${cellParams} data-field="bK" max="${template.beforeMidterm?.K||0}" value="${b.K ?? ''}"></td>
           <td class="px-2 py-2 text-center"><input ${cellParams} data-field="bP" max="${template.beforeMidterm?.P||0}" value="${b.P ?? ''}"></td>
           <td class="px-2 py-2 text-center"><input ${cellParams} data-field="bA" max="${template.beforeMidterm?.A||0}" value="${b.A ?? ''}"></td>
-          <td class="px-2 py-2 text-center border-r border-gray-100"><input ${cellParams} data-field="bT" max="${template.beforeMidterm?.T||0}" value="${b.T ?? ''}"></td>
+          <td class="px-2 py-2 text-center"><input ${cellParams} data-field="bT" max="${template.beforeMidterm?.T||0}" value="${b.T ?? ''}"></td>
+          <td class="px-2 py-2 text-center border-r border-gray-100 font-semibold bg-gray-50 text-gray-700 w-14" data-sum-before="${stu.id}">${(parseFloat(b.K)||0)+(parseFloat(b.P)||0)+(parseFloat(b.A)||0)+(parseFloat(b.T)||0)}</td>
           
           <td class="px-2 py-2 text-center border-r border-gray-100 bg-indigo-50/30"><input ${cellParams} data-field="mid" max="${template.midterm||0}" value="${sc.midterm ?? ''}"></td>
           
           <td class="px-2 py-2 text-center"><input ${cellParams} data-field="aK" max="${template.afterMidterm?.K||0}" value="${a.K ?? ''}"></td>
           <td class="px-2 py-2 text-center"><input ${cellParams} data-field="aP" max="${template.afterMidterm?.P||0}" value="${a.P ?? ''}"></td>
           <td class="px-2 py-2 text-center"><input ${cellParams} data-field="aA" max="${template.afterMidterm?.A||0}" value="${a.A ?? ''}"></td>
-          <td class="px-2 py-2 text-center border-r border-gray-100"><input ${cellParams} data-field="aT" max="${template.afterMidterm?.T||0}" value="${a.T ?? ''}"></td>
+          <td class="px-2 py-2 text-center"><input ${cellParams} data-field="aT" max="${template.afterMidterm?.T||0}" value="${a.T ?? ''}"></td>
+          <td class="px-2 py-2 text-center border-r border-gray-100 font-semibold bg-gray-50 text-gray-700 w-14" data-sum-after="${stu.id}">${(parseFloat(a.K)||0)+(parseFloat(a.P)||0)+(parseFloat(a.A)||0)+(parseFloat(a.T)||0)}</td>
           
           <td class="px-2 py-2 text-center border-r border-gray-100 bg-pink-50/30"><input ${cellParams} data-field="fin" max="${template.final||0}" value="${sc.final ?? ''}"></td>
           
@@ -268,9 +270,9 @@ export async function renderScoresPage(container, userData) {
                 <th rowspan="2" class="sticky left-0 bg-gray-800 px-3 py-3 font-semibold w-12 z-20 border-r border-gray-700">เลขที่</th>
                 <th rowspan="2" class="sticky left-[3rem] bg-gray-800 px-3 py-3 font-semibold w-20 z-20">รหัส</th>
                 <th rowspan="2" class="sticky left-[7.5rem] bg-gray-800 px-3 py-3 font-semibold text-left min-w-[150px] z-20 border-r border-gray-700">ชื่อ-สกุล</th>
-                <th colspan="4" class="px-2 py-2 font-semibold text-center border-b border-r border-gray-700">ก่อนกลางภาค (${(template.beforeMidterm?.K||0)+(template.beforeMidterm?.P||0)+(template.beforeMidterm?.A||0)+(template.beforeMidterm?.T||0)})</th>
+                <th colspan="5" class="px-2 py-2 font-semibold text-center border-b border-r border-gray-700">ก่อนกลางภาค (${(template.beforeMidterm?.K||0)+(template.beforeMidterm?.P||0)+(template.beforeMidterm?.A||0)+(template.beforeMidterm?.T||0)})</th>
                 <th rowspan="2" class="px-2 py-2 font-semibold text-center border-r border-gray-700 bg-gray-700">กลางภาค<br>(${template.midterm||0})</th>
-                <th colspan="4" class="px-2 py-2 font-semibold text-center border-b border-r border-gray-700">หลังกลางภาค (${(template.afterMidterm?.K||0)+(template.afterMidterm?.P||0)+(template.afterMidterm?.A||0)+(template.afterMidterm?.T||0)})</th>
+                <th colspan="5" class="px-2 py-2 font-semibold text-center border-b border-r border-gray-700">หลังกลางภาค (${(template.afterMidterm?.K||0)+(template.afterMidterm?.P||0)+(template.afterMidterm?.A||0)+(template.afterMidterm?.T||0)})</th>
                 <th rowspan="2" class="px-2 py-2 font-semibold text-center border-r border-gray-700 bg-gray-700">ปลายภาค<br>(${template.final||0})</th>
                 <th rowspan="2" class="px-3 py-3 font-semibold text-center border-r border-gray-700 w-16">รวม<br>(100)</th>
                 <th rowspan="2" class="px-3 py-3 font-semibold text-center w-16">เกรด</th>
@@ -279,12 +281,14 @@ export async function renderScoresPage(container, userData) {
                 <th class="px-1 py-1 font-medium text-center" title="ความรู้">K (${template.beforeMidterm?.K||0})</th>
                 <th class="px-1 py-1 font-medium text-center" title="กระบวนการ">P (${template.beforeMidterm?.P||0})</th>
                 <th class="px-1 py-1 font-medium text-center" title="คุณลักษณะ">A (${template.beforeMidterm?.A||0})</th>
-                <th class="px-1 py-1 font-medium text-center border-r border-gray-700" title="ทักษะ">T (${template.beforeMidterm?.T||0})</th>
+                <th class="px-1 py-1 font-medium text-center" title="ทักษะ">T (${template.beforeMidterm?.T||0})</th>
+                <th class="px-1 py-1 font-semibold text-center border-r border-gray-700 bg-gray-700/50" title="รวมก่อนกลางภาค">รวม</th>
                 
                 <th class="px-1 py-1 font-medium text-center" title="ความรู้">K (${template.afterMidterm?.K||0})</th>
                 <th class="px-1 py-1 font-medium text-center" title="กระบวนการ">P (${template.afterMidterm?.P||0})</th>
                 <th class="px-1 py-1 font-medium text-center" title="คุณลักษณะ">A (${template.afterMidterm?.A||0})</th>
                 <th class="px-1 py-1 font-medium text-center border-r border-gray-700" title="ทักษะ">T (${template.afterMidterm?.T||0})</th>
+                <th class="px-1 py-1 font-semibold text-center border-r border-gray-700 bg-gray-700/50" title="รวมหลังกลางภาค">รวม</th>
               </tr>
             </thead>
             <tbody>
@@ -601,10 +605,22 @@ export async function renderScoresPage(container, userData) {
     const total = calculateTotalScore(data, template);
     const grade = calculateGrade(total, gradeRules);
     
+    // Calculate before midterm sum
+    const b = data.beforeMidterm || {};
+    const sumBefore = (parseFloat(b.K)||0) + (parseFloat(b.P)||0) + (parseFloat(b.A)||0) + (parseFloat(b.T)||0);
+    
+    // Calculate after midterm sum
+    const a = data.afterMidterm || {};
+    const sumAfter = (parseFloat(a.K)||0) + (parseFloat(a.P)||0) + (parseFloat(a.A)||0) + (parseFloat(a.T)||0);
+
     // Update UI
+    const sumBeforeEl = document.querySelector(`[data-sum-before="${sid}"]`);
+    const sumAfterEl = document.querySelector(`[data-sum-after="${sid}"]`);
     const sumEl = document.querySelector(`[data-sum="${sid}"]`);
     const grEl = document.querySelector(`[data-grade="${sid}"]`);
     
+    if (sumBeforeEl) sumBeforeEl.textContent = sumBefore;
+    if (sumAfterEl) sumAfterEl.textContent = sumAfter;
     if (sumEl) sumEl.textContent = total;
     if (grEl) {
       grEl.textContent = grade;
