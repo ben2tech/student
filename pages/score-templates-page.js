@@ -104,7 +104,7 @@ export async function renderScoreTemplatesPage(container, userData) {
           <!-- ก่อนกลางภาค -->
           <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3">
             <h3 class="font-bold text-gray-800 border-b pb-2 text-center">ก่อนกลางภาค</h3>
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-3 gap-2">
               <div>
                 <label class="block text-[10px] text-gray-500 text-center mb-1">K (ความรู้)</label>
                 <input type="number" min="0" step="any" data-part="bK" value="${def.b.K}" class="score-input w-full px-2 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-indigo-300 text-center">
@@ -116,10 +116,6 @@ export async function renderScoreTemplatesPage(container, userData) {
               <div>
                 <label class="block text-[10px] text-gray-500 text-center mb-1">A (คุณลักษณะ)</label>
                 <input type="number" min="0" step="any" data-part="bA" value="${def.b.A}" class="score-input w-full px-2 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-indigo-300 text-center">
-              </div>
-              <div>
-                <label class="block text-[10px] text-gray-500 text-center mb-1">T (ทักษะ)</label>
-                <input type="number" min="0" step="any" data-part="bT" value="${def.b.T}" class="score-input w-full px-2 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-indigo-300 text-center">
               </div>
             </div>
           </div>
@@ -135,7 +131,7 @@ export async function renderScoreTemplatesPage(container, userData) {
           <!-- หลังกลางภาค -->
           <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3">
             <h3 class="font-bold text-gray-800 border-b pb-2 text-center">หลังกลางภาค</h3>
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-3 gap-2">
               <div>
                 <label class="block text-[10px] text-gray-500 text-center mb-1">K (ความรู้)</label>
                 <input type="number" min="0" step="any" data-part="aK" value="${def.a.K}" class="score-input w-full px-2 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-indigo-300 text-center">
@@ -147,10 +143,6 @@ export async function renderScoreTemplatesPage(container, userData) {
               <div>
                 <label class="block text-[10px] text-gray-500 text-center mb-1">A (คุณลักษณะ)</label>
                 <input type="number" min="0" step="any" data-part="aA" value="${def.a.A}" class="score-input w-full px-2 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-indigo-300 text-center">
-              </div>
-              <div>
-                <label class="block text-[10px] text-gray-500 text-center mb-1">T (ทักษะ)</label>
-                <input type="number" min="0" step="any" data-part="aT" value="${def.a.T}" class="score-input w-full px-2 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-indigo-300 text-center">
               </div>
             </div>
           </div>
@@ -218,9 +210,9 @@ export async function renderScoreTemplatesPage(container, userData) {
         subjectId: subjectId,
         academicYear: parseInt(year),
         term: parseInt(term),
-        beforeMidterm: { K: getVal('bK'), P: getVal('bP'), A: getVal('bA'), T: getVal('bT') },
+        beforeMidterm: { K: getVal('bK'), P: getVal('bP'), A: getVal('bA'), T: 0 },
         midterm: getVal('mid'),
-        afterMidterm: { K: getVal('aK'), P: getVal('aP'), A: getVal('aA'), T: getVal('aT') },
+        afterMidterm: { K: getVal('aK'), P: getVal('aP'), A: getVal('aA'), T: 0 },
         final: getVal('fin'),
         totalScore: 100,
         createdBy: currentUser().uid
@@ -279,8 +271,8 @@ export async function renderScoreTemplatesPage(container, userData) {
         const subject = subjects.find(s => s.id === t.subjectId);
         const subjName = subject ? `${subject.code} ${subject.name}` : `รหัสวิชา: ${t.subjectId}`;
         
-        const sumBefore = (t.beforeMidterm?.K||0) + (t.beforeMidterm?.P||0) + (t.beforeMidterm?.A||0) + (t.beforeMidterm?.T||0);
-        const sumAfter = (t.afterMidterm?.K||0) + (t.afterMidterm?.P||0) + (t.afterMidterm?.A||0) + (t.afterMidterm?.T||0);
+        const sumBefore = (t.beforeMidterm?.K||0) + (t.beforeMidterm?.P||0) + (t.beforeMidterm?.A||0);
+        const sumAfter = (t.afterMidterm?.K||0) + (t.afterMidterm?.P||0) + (t.afterMidterm?.A||0);
         
         return `
           <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:border-indigo-200 transition cursor-pointer" onclick="document.getElementById('filter-subject').value='${t.subjectId}'; document.getElementById('filter-subject').dispatchEvent(new Event('change'))">

@@ -290,17 +290,17 @@ export async function renderPp5ReportPage(container, userData) {
       
       const hasScores = sc.totalScore !== undefined && sc.totalScore !== null && sc.totalScore !== '';
       
-      const bK = v(sb.K); const bP = v(sb.P); const bA = v(sb.A); const bT = v(sb.T);
+      const bK = v(sb.K); const bP = v(sb.P); const bA = v(sb.A); const bT = 0;
       const mid = v(sc.midterm);
-      const aK = v(sa.K); const aP = v(sa.P); const aA = v(sa.A); const aT = v(sa.T);
+      const aK = v(sa.K); const aP = v(sa.P); const aA = v(sa.A); const aT = 0;
       const fin = v(sc.final);
-      const totalBefore = hasScores ? (bK + bP + bA + bT + mid + aK + aP + aA + aT) : '';
+      const totalBefore = hasScores ? (bK + bP + bA + mid + aK + aP + aA) : '';
       const total = hasScores ? v(sc.totalScore) : '';
       const grade = sc.grade && sc.grade !== '-' ? sc.grade : '';
 
-      sums.bK += bK; sums.bP += bP; sums.bA += bA; sums.bT += bT;
+      sums.bK += bK; sums.bP += bP; sums.bA += bA;
       sums.mid += mid;
-      sums.aK += aK; sums.aP += aP; sums.aA += aA; sums.aT += aT;
+      sums.aK += aK; sums.aP += aP; sums.aA += aA;
       sums.fin += fin;
       if (hasScores) {
         sums.totalBefore += totalBefore;
@@ -308,8 +308,8 @@ export async function renderPp5ReportPage(container, userData) {
       }
 
       const renderCell = (val) => val !== undefined && val !== '' && val !== null ? val : '';
-      const sumBeforePart = hasScores ? (bK + bP + bA + bT) : '';
-      const sumAfterPart = hasScores ? (aK + aP + aA + aT) : '';
+      const sumBeforePart = hasScores ? (bK + bP + bA) : '';
+      const sumAfterPart = hasScores ? (aK + aP + aA) : '';
 
       return `
         <tr>
@@ -317,10 +317,10 @@ export async function renderPp5ReportPage(container, userData) {
           <td>${stu.studentCode}</td>
           <td class="text-left whitespace-nowrap" style="border-right: none !important;">${stu.prefix || ''}${stu.firstName} ${stu.lastName}</td>
           <td style="border-left: none !important;"></td> <!-- คอลัมน์คะแนนเปล่า -->
-          <td>${renderCell(sb.K)}</td><td>${renderCell(sb.P)}</td><td>${renderCell(sb.A)}</td><td>${renderCell(sb.T)}</td>
+          <td>${renderCell(sb.K)}</td><td>${renderCell(sb.P)}</td><td>${renderCell(sb.A)}</td>
           <td class="font-semibold bg-gray-50/10">${renderCell(sumBeforePart)}</td>
           <td>${renderCell(sc.midterm)}</td>
-          <td>${renderCell(sa.K)}</td><td>${renderCell(sa.P)}</td><td>${renderCell(sa.A)}</td><td>${renderCell(sa.T)}</td>
+          <td>${renderCell(sa.K)}</td><td>${renderCell(sa.P)}</td><td>${renderCell(sa.A)}</td>
           <td class="font-semibold bg-gray-50/10">${renderCell(sumAfterPart)}</td>
           <td>${renderCell(totalBefore)}</td>
           <td>${renderCell(sc.final)}</td>
@@ -367,8 +367,6 @@ export async function renderPp5ReportPage(container, userData) {
           <col style="width: 32px;">
           <col style="width: 32px;">
           <col style="width: 32px;">
-          <col style="width: 32px;">
-          <col style="width: 32px;">
         </colgroup>
         <thead>
           <tr>
@@ -376,26 +374,26 @@ export async function renderPp5ReportPage(container, userData) {
             <th rowspan="2">เลข<br>ประจำตัว</th>
             <th rowspan="2" style="border-right: none !important;">ชื่อ-สกุล</th>
             <th rowspan="2" style="border-left: none !important;">คะ<br>แนน</th>
-            <th colspan="5">ก่อนกลางภาค</th>
+            <th colspan="4">ก่อนกลางภาค</th>
             <th rowspan="2">กลาง<br>ภาค</th>
-            <th colspan="5">หลังกลางภาค</th>
+            <th colspan="4">หลังกลางภาค</th>
             <th rowspan="2">รวม</th>
             <th rowspan="2">ปลาย<br>ภาค</th>
             <th rowspan="2">รวม</th>
             <th rowspan="2">เกรด</th>
           </tr>
           <tr>
-            <th>K</th><th>P</th><th>A</th><th>T</th><th>รวม</th>
-            <th>K</th><th>P</th><th>A</th><th>T</th><th>รวม</th>
+            <th>K</th><th>P</th><th>A</th><th>รวม</th>
+            <th>K</th><th>P</th><th>A</th><th>รวม</th>
           </tr>
           <tr class="font-normal text-[9px] bg-gray-50/50">
             <td style="border-right: none !important;"></td>
             <td style="border-left: none !important; border-right: none !important;"></td>
             <td style="border-left: none !important; border-right: none !important;"></td>
             <td style="border-left: none !important;"></td>
-            <td>${b.K||0}</td><td>${b.P||0}</td><td>${b.A||0}</td><td>${b.T||0}</td><td class="font-semibold">${beforeSum}</td>
+            <td>${b.K||0}</td><td>${b.P||0}</td><td>${b.A||0}</td><td class="font-semibold">${beforeSum}</td>
             <td>${template.midterm||0}</td>
-            <td>${a.K||0}</td><td>${a.P||0}</td><td>${a.A||0}</td><td>${a.T||0}</td><td class="font-semibold">${afterSum}</td>
+            <td>${a.K||0}</td><td>${a.P||0}</td><td>${a.A||0}</td><td class="font-semibold">${afterSum}</td>
             <td class="font-semibold">${beforeSum + midMax + afterSum}</td>
             <td>${template.final||0}</td>
             <td class="font-semibold">100</td>
@@ -407,7 +405,7 @@ export async function renderPp5ReportPage(container, userData) {
         </tbody>
         <tfoot>
           <tr class="font-semibold">
-            <td colspan="17" class="text-right pr-2">คะแนนเฉลี่ย</td>
+            <td colspan="15" class="text-right pr-2">คะแนนเฉลี่ย</td>
             <td class="font-bold">${avg(sums.total)}</td>
             <td class="font-bold">${avgGrade}</td>
           </tr>
