@@ -403,7 +403,7 @@ export async function renderPp5ReportPage(container, userData) {
             <td></td><td></td><td></td><td></td>
             <td></td>
             <td></td><td></td><td></td><td></td>
-            <td>${avg(sums.totalBefore)}</td>
+            <td></td>
             <td></td>
             <td class="font-bold">${avg(sums.total)}</td>
             <td class="font-bold">${gradeMode}</td>
@@ -421,7 +421,7 @@ export async function renderPp5ReportPage(container, userData) {
             ${formatClassRoom(classRoom)} &nbsp; ปีการศึกษา ${year} &nbsp; โรงเรียนเบญจมราชรังสฤษฎิ์ ๒
           </h3>
           <div class="text-[10px] font-normal">
-            อัตราส่วนคะแนน &nbsp; ${beforeSum} : ${midMax} : ${afterSum} : ${finalMax} : .......
+            อัตราส่วนคะแนน &nbsp; ${beforeSum} : ${midMax} : ${afterSum} : ${finalMax}
           </div>
         </div>
  
