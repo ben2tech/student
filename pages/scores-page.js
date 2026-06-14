@@ -474,8 +474,7 @@ export async function renderScoresPage(container, userData) {
     const body = `
       <div class="space-y-4">
         <div class="bg-blue-50 p-3 rounded-xl border border-blue-100 text-sm text-blue-800">
-          กรุณาจับคู่คอลัมน์จากไฟล์ CSV ให้ตรงกับช่องคะแนนในระบบ <br>
-          <span class="text-xs text-blue-600">(ระบบจะอ้างอิง "เลขที่" จากคอลัมน์แรกสุดของ CSV เสมอ)</span>
+          กรุณาจับคู่คอลัมน์จากไฟล์ CSV ให้ตรงกับช่องคะแนนในระบบ
         </div>
         
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
@@ -487,9 +486,20 @@ export async function renderScoresPage(container, userData) {
           `).join('')}
         </div>
         
-        <div class="pt-2 border-t border-gray-200">
-          <label class="block text-xs font-semibold text-gray-600 mb-1">ข้อมูลเริ่มที่บรรทัด (เผื่อมี Header หลายบรรทัด)</label>
-          <input type="number" id="csv-data-row" value="2" min="1" class="w-24 px-3 py-2 rounded-xl border border-gray-200 text-sm">
+        <div class="pt-2 border-t border-gray-200 flex flex-wrap gap-6">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">คอลัมน์ที่เป็น "เลขที่นักเรียน"</label>
+            <select id="csv-student-col" class="w-40 px-3 py-2 rounded-xl border border-gray-200 text-sm">
+              ${headers.map((h, i) => {
+                const label = h ? `คอลัมน์ ${getColumnLetter(i)} (${h})` : `คอลัมน์ ${getColumnLetter(i)}`;
+                return `<option value="${i}" ${i === 0 ? 'selected' : ''}>${label}</option>`;
+              }).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">ข้อมูลเริ่มที่บรรทัด (ข้ามส่วนหัว)</label>
+            <input type="number" id="csv-data-row" value="2" min="1" class="w-24 px-3 py-2 rounded-xl border border-gray-200 text-sm">
+          </div>
         </div>
       </div>
     `;
@@ -504,6 +514,7 @@ export async function renderScoresPage(container, userData) {
     document.getElementById('btn-cancel-csv').onclick = closeModal;
     document.getElementById('btn-confirm-csv').onclick = () => {
       const dataRow = parseInt(document.getElementById('csv-data-row').value) || 2;
+      const studentCol = parseInt(document.getElementById('csv-student-col').value) || 0;
       let parsed;
       try {
         parsed = parseScoreCSV(rawCsvText, 1, dataRow);
@@ -529,7 +540,7 @@ export async function renderScoresPage(container, userData) {
 
       let appliedCount = 0;
       parsed.data.forEach(row => {
-        const studentNumber = parseInt(row[0]);
+        const studentNumber = parseInt(row[studentCol]);
         if (!studentNumber || isNaN(studentNumber)) return;
 
         const stu = students.find(s => parseInt(s.number) === studentNumber);
