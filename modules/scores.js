@@ -124,12 +124,14 @@ export function parseScoresFromClipboard(clipboardText, columnOrder) {
  * @param {number} dataRow บรรทัดที่ข้อมูลเริ่ม (1-indexed)
  */
 export function parseScoreCSV(csvText, headerRow = 1, dataRow = 2) {
-  const lines = csvText.trim().split(/\r?\n/).filter(l => l.trim() !== '');
+  // ไม่ตัดบรรทัดว่างทิ้ง เพื่อให้เลขบรรทัดอ้างอิง (Row number) ตรงกับที่ผู้ใช้เห็นใน Excel
+  const lines = csvText.split(/\r?\n/);
   if (lines.length === 0) throw new Error('ไฟล์ว่างเปล่า');
 
   let sep = ',';
-  if (lines[0].includes('\t')) sep = '\t';
-  else if (lines[0].includes(';')) sep = ';';
+  const sampleLine = lines.find(l => l.trim().length > 0) || '';
+  if (sampleLine.includes('\t')) sep = '\t';
+  else if (sampleLine.includes(';')) sep = ';';
 
   const hIdx = Math.max(0, headerRow - 1);
   const dIdx = Math.max(0, dataRow - 1);
@@ -140,6 +142,8 @@ export function parseScoreCSV(csvText, headerRow = 1, dataRow = 2) {
   
   const data = [];
   for (let i = dIdx; i < lines.length; i++) {
+    const l = lines[i].trim();
+    if (!l) continue; // ข้ามบรรทัดว่างตอนดึงข้อมูล
     const cols = lines[i].split(sep).map(c => c.trim().replace(/^["']|["']$/g, ''));
     data.push(cols);
   }
