@@ -450,10 +450,24 @@ export async function renderScoresPage(container, userData) {
       { id: 'fin', label: 'ปลายภาค' }
     ];
 
+    const getColumnLetter = (colIndex) => {
+      let letter = '';
+      let temp = colIndex;
+      while (temp >= 0) {
+        letter = String.fromCharCode(65 + (temp % 26)) + letter;
+        temp = Math.floor(temp / 26) - 1;
+      }
+      return letter;
+    };
+
     const makeSelect = (fieldId) => `
       <select data-map-field="${fieldId}" class="w-full px-2 py-1.5 rounded-lg border border-gray-200 text-sm">
         <option value="">-- ไม่นำเข้า --</option>
-        ${headers.map((h, i) => `<option value="${i}">${h || `คอลัมน์ ${i+1}`}</option>`).join('')}
+        ${headers.map((h, i) => {
+          const colLetter = getColumnLetter(i);
+          const label = h ? `คอลัมน์ ${colLetter} (${h})` : `คอลัมน์ ${colLetter}`;
+          return `<option value="${i}">${label}</option>`;
+        }).join('')}
       </select>
     `;
 
