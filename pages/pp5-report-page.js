@@ -334,6 +334,7 @@ export async function renderPp5ReportPage(container, userData) {
       let maxCount = 0;
       let mode = '-';
       const gradeWeights = { '4': 8, '3.5': 7, '3': 6, '2.5': 5, '2': 4, '1.5': 3, '1': 2, '0': 1 };
+      const getWeight = (g) => gradeWeights[g] || 0;
       
       for (const val of arr) {
         counts[val] = (counts[val] || 0) + 1;
@@ -341,7 +342,7 @@ export async function renderPp5ReportPage(container, userData) {
           maxCount = counts[val];
           mode = val;
         } else if (counts[val] === maxCount) {
-          if (gradeWeights[val] > gradeWeights[mode]) {
+          if (getWeight(val) > getWeight(mode)) {
             mode = val;
           }
         }
