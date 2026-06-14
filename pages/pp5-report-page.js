@@ -27,7 +27,7 @@ export async function renderPp5ReportPage(container, userData) {
         box-sizing: border-box;
       }
       #pp5-preview table { 
-        width: 100%; 
+        width: auto; 
         border-collapse: collapse; 
         table-layout: auto;
       }
@@ -86,7 +86,7 @@ export async function renderPp5ReportPage(container, userData) {
         }
         
         #pp5-preview table { 
-          width: 100% !important; 
+          width: auto !important; 
           border-collapse: collapse !important; 
           table-layout: auto !important;
         }
@@ -345,23 +345,23 @@ export async function renderPp5ReportPage(container, userData) {
     const tableHtml = `
       <table>
         <colgroup>
-          <col style="width: 4%;">
-          <col style="width: 8%;">
+          <col style="width: 35px;">
+          <col style="width: 65px;">
           <col style="width: 1px;">
-          <col style="width: 4%;">
-          <col style="width: 6%;">
-          <col style="width: 6%;">
-          <col style="width: 6%;">
-          <col style="width: 6%;">
-          <col style="width: 7%;">
-          <col style="width: 6%;">
-          <col style="width: 6%;">
-          <col style="width: 6%;">
-          <col style="width: 6%;">
-          <col style="width: 7%;">
-          <col style="width: 7%;">
-          <col style="width: 8%;">
-          <col style="width: 7%;">
+          <col style="width: 32px;">
+          <col style="width: 32px;">
+          <col style="width: 32px;">
+          <col style="width: 32px;">
+          <col style="width: 32px;">
+          <col style="width: 32px;">
+          <col style="width: 32px;">
+          <col style="width: 32px;">
+          <col style="width: 32px;">
+          <col style="width: 32px;">
+          <col style="width: 32px;">
+          <col style="width: 32px;">
+          <col style="width: 32px;">
+          <col style="width: 32px;">
         </colgroup>
         <thead>
           <tr>
