@@ -349,19 +349,19 @@ export async function renderPp5ReportPage(container, userData) {
           <col style="width: 8%;">
           <col style="width: 1px;">
           <col style="width: 4%;">
-          <col style="width: 4%;">
-          <col style="width: 4%;">
-          <col style="width: 4%;">
-          <col style="width: 4%;">
-          <col style="width: 5%;">
-          <col style="width: 4%;">
-          <col style="width: 4%;">
-          <col style="width: 4%;">
-          <col style="width: 4%;">
-          <col style="width: 5%;">
-          <col style="width: 5%;">
-          <col style="width: 5%;">
-          <col style="width: 5%;">
+          <col style="width: 6%;">
+          <col style="width: 6%;">
+          <col style="width: 6%;">
+          <col style="width: 6%;">
+          <col style="width: 7%;">
+          <col style="width: 6%;">
+          <col style="width: 6%;">
+          <col style="width: 6%;">
+          <col style="width: 6%;">
+          <col style="width: 7%;">
+          <col style="width: 7%;">
+          <col style="width: 8%;">
+          <col style="width: 7%;">
         </colgroup>
         <thead>
           <tr>
@@ -388,13 +388,7 @@ export async function renderPp5ReportPage(container, userData) {
         </tbody>
         <tfoot>
           <tr class="font-semibold">
-            <td colspan="3" class="text-right pr-2" style="border-right: none !important;">คะแนนเฉลี่ย</td>
-            <td style="border-left: none !important;"></td>
-            <td></td><td></td><td></td><td></td>
-            <td></td>
-            <td></td><td></td><td></td><td></td>
-            <td></td>
-            <td></td>
+            <td colspan="15" class="text-right pr-2">คะแนนเฉลี่ย</td>
             <td class="font-bold">${avg(sums.total)}</td>
             <td class="font-bold">${avgGrade}</td>
           </tr>
