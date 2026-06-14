@@ -89,5 +89,23 @@ service cloud.firestore {
       allow read:  if isAuth();
       allow write: if isAdmin();
     }
+
+    // ── scoreTemplates ────────────────────────────────────────────────────────
+    match /scoreTemplates/{docId} {
+      allow read:  if isAuth();
+      allow write: if isTeacher();
+    }
+
+    // ── gradeRules ────────────────────────────────────────────────────────────
+    match /gradeRules/{docId} {
+      allow read:  if isAuth();
+      allow write: if isAdmin();
+    }
+
+    // ── scores ────────────────────────────────────────────────────────────────
+    match /scores/{docId} {
+      allow read:  if isAuth();
+      allow write: if isTeacher();
+    }
   }
 }

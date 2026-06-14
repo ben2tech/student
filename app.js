@@ -11,6 +11,10 @@ import { renderReportsPage } from './pages/reports-page.js?v=1.3';
 import { renderParentPage } from './pages/parent-page.js';
 import { renderUsersPage } from './pages/users-page.js';
 import { renderClassesPage } from './pages/classes-page.js';
+import { renderScoreTemplatesPage } from './pages/score-templates-page.js';
+import { renderGradeRulesPage } from './pages/grade-rules-page.js';
+import { renderScoresPage } from './pages/scores-page.js';
+import { renderPp5ReportPage } from './pages/pp5-report-page.js';
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let currentUserData = null;
@@ -24,6 +28,10 @@ const ROUTES = {
   students:           { label: 'นักเรียน',            icon: '👨‍🎓', render: renderStudentsPage,         roles: ['admin','homeroom_teacher'] },
   attendance:         { label: 'เช็คชื่อ',            icon: '✅', render: renderAttendancePage,        roles: ['admin','homeroom_teacher','subject_teacher'] },
   behavior:           { label: 'พฤติกรรม',           icon: '✏️', render: renderBehaviorPage,           roles: ['admin','homeroom_teacher','subject_teacher'] },
+  'score-templates':  { label: 'โครงสร้างคะแนน',       icon: '📋', render: renderScoreTemplatesPage,    roles: ['admin','subject_teacher'] },
+  'grade-rules':      { label: 'เกณฑ์ตัดเกรด',        icon: '⚖️', render: renderGradeRulesPage,        roles: ['admin'] },
+  scores:             { label: 'บันทึกคะแนน',         icon: '📝', render: renderScoresPage,            roles: ['admin','homeroom_teacher','subject_teacher'] },
+  'pp5-report':       { label: 'พิมพ์ ปพ.5',          icon: '🖨️', render: renderPp5ReportPage,         roles: ['admin','homeroom_teacher','subject_teacher'] },
   'behavior-criteria':{ label: 'เกณฑ์พฤติกรรม',     icon: '⚙️', render: renderBehaviorCriteriaPage,  roles: ['admin'] },
   reports:            { label: 'รายงาน',              icon: '📈', render: renderReportsPage,           roles: ['admin','homeroom_teacher'] },
   parent:             { label: 'ข้อมูลบุตรหลาน',     icon: '👨‍👧', render: renderParentPage,            roles: ['admin', 'parent'] },
