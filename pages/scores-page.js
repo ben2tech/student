@@ -486,10 +486,10 @@ export async function renderScoresPage(container, userData) {
           `).join('')}
         </div>
         
-        <div class="pt-2 border-t border-gray-200 flex flex-wrap gap-6">
+        <div class="pt-2 border-t border-gray-200 grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">คอลัมน์ที่เป็น "เลขที่นักเรียน"</label>
-            <select id="csv-student-col" class="w-40 px-3 py-2 rounded-xl border border-gray-200 text-sm">
+            <label class="block text-xs font-semibold text-gray-600 mb-1">ใช้อ้างอิงนักเรียนจาก</label>
+            <select id="csv-student-col" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm">
               ${headers.map((h, i) => {
                 const label = h ? `คอลัมน์ ${getColumnLetter(i)} (${h})` : `คอลัมน์ ${getColumnLetter(i)}`;
                 return `<option value="${i}" ${i === 0 ? 'selected' : ''}>${label}</option>`;
@@ -497,8 +497,16 @@ export async function renderScoresPage(container, userData) {
             </select>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">ข้อมูลเริ่มที่บรรทัด (ข้ามส่วนหัว)</label>
-            <input type="number" id="csv-data-row" value="2" min="1" class="w-24 px-3 py-2 rounded-xl border border-gray-200 text-sm">
+            <label class="block text-xs font-semibold text-gray-600 mb-1">ตรงกับข้อมูลในระบบคือ</label>
+            <select id="csv-match-type" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm">
+              <option value="number">เลขที่ (1, 2, 3...)</option>
+              <option value="firstName">ชื่อจริง (ไม่รวมนามสกุล)</option>
+              <option value="studentCode">รหัสประจำตัวนักเรียน</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">ข้อมูลเริ่มที่บรรทัด</label>
+            <input type="number" id="csv-data-row" value="2" min="1" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm">
           </div>
         </div>
       </div>
@@ -515,6 +523,7 @@ export async function renderScoresPage(container, userData) {
     document.getElementById('btn-confirm-csv').onclick = () => {
       const dataRow = parseInt(document.getElementById('csv-data-row').value) || 2;
       const studentCol = parseInt(document.getElementById('csv-student-col').value) || 0;
+      const matchType = document.getElementById('csv-match-type').value || 'number';
       let parsed;
       try {
         parsed = parseScoreCSV(rawCsvText, 1, dataRow);
@@ -540,10 +549,20 @@ export async function renderScoresPage(container, userData) {
 
       let appliedCount = 0;
       parsed.data.forEach(row => {
-        const studentNumber = parseInt(row[studentCol]);
-        if (!studentNumber || isNaN(studentNumber)) return;
+        const identifier = (row[studentCol] || '').trim();
+        if (!identifier) return;
 
-        const stu = students.find(s => parseInt(s.number) === studentNumber);
+        let stu;
+        if (matchType === 'number') {
+          const num = parseInt(identifier);
+          if (isNaN(num)) return;
+          stu = students.find(s => parseInt(s.number) === num);
+        } else if (matchType === 'firstName') {
+          stu = students.find(s => s.firstName === identifier);
+        } else if (matchType === 'studentCode') {
+          stu = students.find(s => s.studentCode === identifier);
+        }
+
         if (!stu) return;
 
         const tr = document.querySelector(`tr[data-row-sid="${stu.id}"]`);
