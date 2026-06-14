@@ -14,6 +14,33 @@ export async function renderPp5ReportPage(container, userData) {
 
   container.innerHTML = `
     <style id="pp5-print-style">
+      /* Screen Styles */
+      #pp5-preview { 
+        font-family: 'Sarabun', 'TH SarabunPSK', sans-serif;
+        background: white;
+        color: black;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        max-width: 210mm;
+        margin: 0 auto;
+        padding: 15mm 10mm;
+        box-sizing: border-box;
+      }
+      #pp5-preview table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        table-layout: fixed;
+      }
+      #pp5-preview th, #pp5-preview td { 
+        border: 1px solid black !important; 
+        padding: 4px 2px; 
+        text-align: center;
+        font-size: 10px;
+        line-height: 1.2;
+        word-wrap: break-word;
+      }
+      #pp5-preview .text-left { text-align: left; }
+      
       @media print {
         html, body {
           background: white !important;
@@ -42,49 +69,45 @@ export async function renderPp5ReportPage(container, userData) {
         }
         
         @page { 
-          size: A4 landscape; 
-          margin: 10mm;
+          size: A4 portrait; 
+          margin: 5mm;
         }
         
         #pp5-preview { 
           font-family: 'Sarabun', 'TH SarabunPSK', serif, sans-serif !important;
-          font-size: 11pt !important; 
+          font-size: 9px !important; 
           color: black !important;
           width: 100% !important;
           background: white !important;
           box-shadow: none !important;
           border: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
         }
         
         #pp5-preview table { 
-          width: 100%; 
-          border-collapse: collapse; 
+          width: 100% !important; 
+          border-collapse: collapse !important; 
+          table-layout: fixed !important;
         }
         
         #pp5-preview th, #pp5-preview td { 
           border: 1px solid black !important; 
-          padding: 3px 5px !important; 
-          text-align: center;
+          padding: 2px 1px !important; 
+          text-align: center !important;
+          font-size: 8px !important;
+          line-height: 1.1 !important;
+          word-wrap: break-word !important;
         }
         
         #pp5-preview .text-left { text-align: left !important; }
-        
-        /* เอาสีพื้นหลังและสี Badge ออกเมื่อพิมพ์ */
-        #pp5-preview .bg-emerald-100, #pp5-preview .bg-teal-100, 
-        #pp5-preview .bg-cyan-100, #pp5-preview .bg-blue-100, 
-        #pp5-preview .bg-amber-100, #pp5-preview .bg-orange-100, 
-        #pp5-preview .bg-rose-100, #pp5-preview .bg-red-100,
-        #pp5-preview .bg-gray-100, #pp5-preview .bg-indigo-50, #pp5-preview .bg-pink-50 {
-          background-color: transparent !important;
-          color: black !important;
-        }
       }
     </style>
 
     <div class="space-y-6">
       <div class="no-print">
         <h1 class="text-2xl font-bold text-gray-800">พิมพ์ ปพ.5</h1>
-        <p class="text-sm text-gray-500 mt-0.5">แบบบันทึกผลการเรียนรายวิชา</p>
+        <p class="text-sm text-gray-500 mt-0.5">แบบบันทึกผลการเรียนรายวิชา (แนวตั้ง)</p>
       </div>
 
       <!-- Filter Bar -->
@@ -234,13 +257,26 @@ export async function renderPp5ReportPage(container, userData) {
     return map[g] || '';
   }
 
+  function formatClassRoom(classRoom) {
+    let clean = classRoom.replace('ม.', '').replace('ม', '').trim();
+    return `ชั้นมัธยมศึกษาปีที่ ${clean}`;
+  }
+
   function renderDocument(template, gradeRules, students, scores, year, term, classRoom, subjCode, subjName) {
     const b = template.beforeMidterm || {};
     const a = template.afterMidterm || {};
 
+    const v = (val) => val !== undefined && val !== '' && val !== null ? parseFloat(val) : 0;
+    
+    // Calculate ratio text values
+    const beforeSum = v(b.K) + v(b.P) + v(b.A) + v(b.T);
+    const midMax = v(template.midterm);
+    const afterSum = v(a.K) + v(a.P) + v(a.A) + v(a.T);
+    const finalMax = v(template.final);
+
     let sums = {
       bK:0, bP:0, bA:0, bT:0, mid:0,
-      aK:0, aP:0, aA:0, aT:0, fin:0, total:0
+      aK:0, aP:0, aA:0, aT:0, fin:0, totalBefore:0, total:0
     };
     let count = students.length;
     let gradeCounts = { '4':0, '3.5':0, '3':0, '2.5':0, '2':0, '1.5':0, '1':0, '0':0 };
@@ -250,12 +286,13 @@ export async function renderPp5ReportPage(container, userData) {
       const sb = sc.beforeMidterm || {};
       const sa = sc.afterMidterm || {};
       
-      const v = (val) => val !== undefined && val !== '' && val !== null ? parseFloat(val) : 0;
+      const hasScores = sc.totalScore !== undefined && sc.totalScore !== null && sc.totalScore !== '';
       
       const bK = v(sb.K); const bP = v(sb.P); const bA = v(sb.A); const bT = v(sb.T);
       const mid = v(sc.midterm);
       const aK = v(sa.K); const aP = v(sa.P); const aA = v(sa.A); const aT = v(sa.T);
       const fin = v(sc.final);
+      const totalBefore = hasScores ? (bK + bP + bA + bT + mid + aK + aP + aA + aT) : 0;
       const total = v(sc.totalScore);
       const grade = sc.grade || '-';
 
@@ -263,25 +300,28 @@ export async function renderPp5ReportPage(container, userData) {
       sums.mid += mid;
       sums.aK += aK; sums.aP += aP; sums.aA += aA; sums.aT += aT;
       sums.fin += fin;
+      sums.totalBefore += totalBefore;
       sums.total += total;
 
       if (grade !== '-' && gradeCounts[grade] !== undefined) {
         gradeCounts[grade]++;
       }
 
-      const p = (val) => val === 0 && !sc.totalScore ? '-' : val;
+      const p = (val) => !hasScores ? '-' : val;
 
       return `
         <tr>
           <td>${stu.number}</td>
           <td>${stu.studentCode}</td>
           <td class="text-left whitespace-nowrap">${stu.firstName} ${stu.lastName}</td>
+          <td></td> <!-- คอลัมน์คะแนนเปล่า -->
           <td>${p(bK)}</td><td>${p(bP)}</td><td>${p(bA)}</td><td>${p(bT)}</td>
-          <td class="bg-indigo-50/50 font-medium">${p(mid)}</td>
+          <td>${p(mid)}</td>
           <td>${p(aK)}</td><td>${p(aP)}</td><td>${p(aA)}</td><td>${p(aT)}</td>
-          <td class="bg-pink-50/50 font-medium">${p(fin)}</td>
+          <td>${p(totalBefore)}</td>
+          <td>${p(fin)}</td>
           <td class="font-bold">${p(total)}</td>
-          <td class="font-bold"><span class="inline-block px-2 rounded-md ${getGradeColor(grade)}">${grade}</span></td>
+          <td class="font-bold">${grade}</td>
         </tr>
       `;
     }).join('');
@@ -289,44 +329,59 @@ export async function renderPp5ReportPage(container, userData) {
     const avg = (sum) => count > 0 ? (sum / count).toFixed(2) : '-';
 
     const tableHtml = `
-      <table class="w-full text-sm border-collapse border border-gray-400">
+      <table>
+        <colgroup>
+          <col style="width: 4%;">
+          <col style="width: 8%;">
+          <col style="width: 27%;">
+          <col style="width: 4%;">
+          <col style="width: 4%;">
+          <col style="width: 4%;">
+          <col style="width: 4%;">
+          <col style="width: 4%;">
+          <col style="width: 5%;">
+          <col style="width: 4%;">
+          <col style="width: 4%;">
+          <col style="width: 4%;">
+          <col style="width: 4%;">
+          <col style="width: 5%;">
+          <col style="width: 5%;">
+          <col style="width: 5%;">
+          <col style="width: 5%;">
+        </colgroup>
         <thead>
-          <tr class="bg-gray-100">
-            <th rowspan="2" class="w-10">เลขที่</th>
-            <th rowspan="2" class="w-16">รหัส</th>
-            <th rowspan="2" class="text-left w-48">ชื่อ-สกุล</th>
-            <th colspan="4">คะแนนก่อนกลางภาค</th>
-            <th rowspan="2" class="w-12 bg-gray-200">กลางภาค</th>
-            <th colspan="4">คะแนนหลังกลางภาค</th>
-            <th rowspan="2" class="w-12 bg-gray-200">ปลายภาค</th>
-            <th rowspan="2" class="w-12 font-bold">รวม</th>
-            <th rowspan="2" class="w-16 font-bold">ผลการเรียน</th>
+          <tr>
+            <th rowspan="2">เลขที่</th>
+            <th rowspan="2">เลข<br>ประจำตัว</th>
+            <th rowspan="2">ชื่อ-สกุล</th>
+            <th rowspan="2">คะ<br>แนน</th>
+            <th colspan="4">ก่อนกลางภาค</th>
+            <th rowspan="2">กลาง<br>ภาค</th>
+            <th colspan="4">หลังกลางภาค</th>
+            <th rowspan="2">รวม</th>
+            <th rowspan="2">ปลาย<br>ภาค</th>
+            <th>รวม</th>
+            <th rowspan="2">เกรด</th>
           </tr>
-          <tr class="bg-gray-50 text-[11px]">
-            <th class="w-8">K</th><th class="w-8">P</th><th class="w-8">A</th><th class="w-8">T</th>
-            <th class="w-8">K</th><th class="w-8">P</th><th class="w-8">A</th><th class="w-8">T</th>
-          </tr>
-          <tr class="bg-yellow-50 text-xs font-semibold text-gray-700">
-            <td colspan="3" class="text-right pr-2">คะแนนเต็ม</td>
-            <td>(${b.K||0})</td><td>(${b.P||0})</td><td>(${b.A||0})</td><td>(${b.T||0})</td>
-            <td class="bg-yellow-100">(${template.midterm||0})</td>
-            <td>(${a.K||0})</td><td>(${a.P||0})</td><td>(${a.A||0})</td><td>(${a.T||0})</td>
-            <td class="bg-yellow-100">(${template.final||0})</td>
-            <td>(100)</td>
-            <td>-</td>
+          <tr>
+            <th>K</th><th>P</th><th>A</th><th>T</th>
+            <th>K</th><th>P</th><th>A</th><th>T</th>
+            <th class="text-[9px] font-normal">100</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-300">
+        <tbody>
           ${rowsHtml}
         </tbody>
         <tfoot>
-          <tr class="bg-gray-100 font-semibold text-xs">
+          <tr class="font-semibold">
             <td colspan="3" class="text-right pr-2">คะแนนเฉลี่ย</td>
+            <td></td>
             <td>${avg(sums.bK)}</td><td>${avg(sums.bP)}</td><td>${avg(sums.bA)}</td><td>${avg(sums.bT)}</td>
             <td>${avg(sums.mid)}</td>
             <td>${avg(sums.aK)}</td><td>${avg(sums.aP)}</td><td>${avg(sums.aA)}</td><td>${avg(sums.aT)}</td>
+            <td>${avg(sums.totalBefore)}</td>
             <td>${avg(sums.fin)}</td>
-            <td class="text-indigo-700">${avg(sums.total)}</td>
+            <td class="font-bold">${avg(sums.total)}</td>
             <td>-</td>
           </tr>
         </tfoot>
@@ -334,7 +389,7 @@ export async function renderPp5ReportPage(container, userData) {
     `;
 
     // Summary box
-    let summaryHtml = '<div class="flex gap-4 mb-2">';
+    let summaryHtml = '<div class="flex flex-wrap gap-x-4 gap-y-1 mb-2">';
     ['4', '3.5', '3', '2.5', '2', '1.5', '1', '0'].forEach(g => {
       summaryHtml += `<div>เกรด ${g}: <span class="font-bold">${gradeCounts[g]}</span> คน</div>`;
     });
@@ -348,36 +403,36 @@ export async function renderPp5ReportPage(container, userData) {
     `;
 
     previewContainer.innerHTML = `
-      <div id="pp5-preview" class="bg-white p-8 rounded-2xl shadow-md border border-gray-200 overflow-x-auto max-w-5xl mx-auto" style="font-family: 'Sarabun', 'TH SarabunPSK', sans-serif;">
+      <div id="pp5-preview">
         
-        <div class="text-center mb-6">
-          <h2 class="text-xl font-bold mb-1">แบบบันทึกผลการเรียนรายวิชา (ปพ.5)</h2>
-          <h3 class="text-lg font-bold mb-3">โรงเรียนเบญจมราชรังสฤษฎิ์ ๒</h3>
-          <div class="flex justify-center gap-6 text-sm">
-            <span>ชั้น <span class="font-bold">${classRoom}</span></span>
-            <span>วิชา <span class="font-bold">${subjCode} ${subjName}</span></span>
-            <span>ภาคเรียนที่ <span class="font-bold">${term}</span> ปีการศึกษา <span class="font-bold">${year}</span></span>
+        <div class="text-center mb-4 text-black">
+          <h2 class="text-base font-bold mb-0.5">แบบบันทึกคะแนน ปพ.5</h2>
+          <h3 class="text-xs font-semibold mb-1">
+            ${formatClassRoom(classRoom)} &nbsp; ปีการศึกษา ${year} &nbsp; โรงเรียนเบญจมราชรังสฤษฎิ์ ๒
+          </h3>
+          <div class="text-[10px] font-normal">
+            อัตราส่วนคะแนน &nbsp; ${beforeSum} : ${midMax} : ${afterSum} : ${finalMax} : .......
           </div>
         </div>
-
+ 
         ${tableHtml}
-
-        <div class="mt-8 border border-gray-400 p-4 rounded bg-gray-50 text-sm">
-          <div class="font-bold mb-2 underline">สรุปผลการเรียน</div>
+ 
+        <div class="mt-6 border border-black p-3 rounded bg-gray-50/50 text-xs">
+          <div class="font-bold mb-1.5 underline">สรุปผลการเรียน</div>
           ${summaryHtml}
         </div>
         
-        <div class="mt-12 flex justify-around text-sm text-center">
+        <div class="mt-10 flex justify-around text-xs text-center">
           <div>
             <div>ลงชื่อ .............................................................. ครูผู้สอน</div>
-            <div class="mt-2">( .............................................................. )</div>
+            <div class="mt-1.5">( .............................................................. )</div>
           </div>
           <div>
             <div>ลงชื่อ .............................................................. หัวหน้ากลุ่มสาระฯ</div>
-            <div class="mt-2">( .............................................................. )</div>
+            <div class="mt-1.5">( .............................................................. )</div>
           </div>
         </div>
-
+ 
       </div>
     `;
   }
