@@ -116,3 +116,33 @@ export function parseScoresFromClipboard(clipboardText, columnOrder) {
   
   return rows;
 }
+
+/** 
+ * อ่านไฟล์ CSV เพื่อใช้สำหรับหน้าต่างจับคู่คอลัมน์ 
+ * @param {string} csvText ข้อมูล CSV
+ * @param {number} headerRow บรรทัดที่เป็นส่วนหัว (1-indexed)
+ * @param {number} dataRow บรรทัดที่ข้อมูลเริ่ม (1-indexed)
+ */
+export function parseScoreCSV(csvText, headerRow = 1, dataRow = 2) {
+  const lines = csvText.trim().split(/\r?\n/).filter(l => l.trim() !== '');
+  if (lines.length === 0) throw new Error('ไฟล์ว่างเปล่า');
+
+  let sep = ',';
+  if (lines[0].includes('\t')) sep = '\t';
+  else if (lines[0].includes(';')) sep = ';';
+
+  const hIdx = Math.max(0, headerRow - 1);
+  const dIdx = Math.max(0, dataRow - 1);
+
+  if (hIdx >= lines.length) throw new Error('ไม่พบบรรทัดส่วนหัวตามที่ระบุ');
+  
+  const headers = lines[hIdx].split(sep).map(h => h.trim().replace(/^["']|["']$/g, ''));
+  
+  const data = [];
+  for (let i = dIdx; i < lines.length; i++) {
+    const cols = lines[i].split(sep).map(c => c.trim().replace(/^["']|["']$/g, ''));
+    data.push(cols);
+  }
+
+  return { headers, data };
+}

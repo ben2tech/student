@@ -1,13 +1,13 @@
 // pages/scores-page.js — Manage Scores DataTable
 import { db } from '../firebase-config.js';
-import { getScoresByClass, saveScore, saveScoresBatch, calculateTotalScore, parseScoresFromClipboard, makeScoreId } from '../modules/scores.js';
+import { getScoresByClass, saveScore, saveScoresBatch, calculateTotalScore, parseScoresFromClipboard, parseScoreCSV, makeScoreId } from '../modules/scores.js';
 import { getScoreTemplate } from '../modules/score-templates.js';
 import { getGradeRules, calculateGrade } from '../modules/grade-rules.js';
 import { getStudents } from '../modules/students.js';
 import { getSubjects, getSubjectsByTeacher } from '../modules/subjects.js';
 import { getClassrooms } from '../modules/classes.js';
 import { currentUser, hasRole } from '../modules/auth.js';
-import { showToast, spinnerHTML, emptyHTML } from '../modules/utils.js';
+import { showToast, openModal, closeModal, spinnerHTML, emptyHTML } from '../modules/utils.js';
 
 export async function renderScoresPage(container, userData) {
   const currentYear = new Date().getFullYear() + 543;
@@ -249,9 +249,16 @@ export async function renderScoresPage(container, userData) {
           <div class="text-gray-500">
             💡 กด <kbd class="bg-white border rounded px-1 text-xs">Ctrl</kbd> + <kbd class="bg-white border rounded px-1 text-xs">V</kbd> เพื่อวางข้อมูลจาก Excel ได้ (เรียงคอลัมน์ K,P,A,T, กลางภาค, ...)
           </div>
-          <button id="btn-save-all" class="px-4 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-medium hover:bg-indigo-700 transition">
-            บันทึกทั้งหมด
-          </button>
+          <div class="flex items-center gap-2">
+            <input type="file" id="csv-upload" accept=".csv" class="hidden">
+            <button id="btn-upload-csv" class="px-4 py-1.5 rounded-lg bg-green-600 text-white text-xs font-medium hover:bg-green-700 transition flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+              อัปโหลด CSV
+            </button>
+            <button id="btn-save-all" class="px-4 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-medium hover:bg-indigo-700 transition">
+              บันทึกทั้งหมด
+            </button>
+          </div>
         </div>` : ''}
         
         <div class="overflow-x-auto">
@@ -383,6 +390,31 @@ export async function renderScoresPage(container, userData) {
       showToast(`วางข้อมูล ${rows.length} แถว กด "บันทึกทั้งหมด" เมื่อตรวจสอบแล้ว`, 'info');
     });
 
+    // CSV Upload
+    const btnUploadCsv = document.getElementById('btn-upload-csv');
+    const fileCsv = document.getElementById('csv-upload');
+    if (btnUploadCsv && fileCsv) {
+      btnUploadCsv.onclick = () => fileCsv.click();
+      
+      fileCsv.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const csvText = ev.target.result;
+            const { headers, data } = parseScoreCSV(csvText, 1, 2);
+            showCsvMappingModal(headers, data, csvText);
+          } catch (err) {
+            showToast('เกิดข้อผิดพลาดในการอ่านไฟล์ CSV: ' + err.message, 'error');
+          }
+          fileCsv.value = ''; // Reset
+        };
+        reader.readAsText(file);
+      };
+    }
+
     // Save All Button
     const btnSaveAll = document.getElementById('btn-save-all');
     if (btnSaveAll) {
@@ -406,6 +438,118 @@ export async function renderScoresPage(container, userData) {
         btnSaveAll.disabled = false;
       };
     }
+  }
+
+  function showCsvMappingModal(headers, initialData, rawCsvText) {
+    const fields = [
+      { id: 'bK', label: 'ก่อนกลางภาค K' }, { id: 'bP', label: 'ก่อนกลางภาค P' },
+      { id: 'bA', label: 'ก่อนกลางภาค A' }, { id: 'bT', label: 'ก่อนกลางภาค T' },
+      { id: 'mid', label: 'กลางภาค' },
+      { id: 'aK', label: 'หลังกลางภาค K' }, { id: 'aP', label: 'หลังกลางภาค P' },
+      { id: 'aA', label: 'หลังกลางภาค A' }, { id: 'aT', label: 'หลังกลางภาค T' },
+      { id: 'fin', label: 'ปลายภาค' }
+    ];
+
+    const makeSelect = (fieldId) => `
+      <select data-map-field="${fieldId}" class="w-full px-2 py-1.5 rounded-lg border border-gray-200 text-sm">
+        <option value="">-- ไม่นำเข้า --</option>
+        ${headers.map((h, i) => `<option value="${i}">${h || `คอลัมน์ ${i+1}`}</option>`).join('')}
+      </select>
+    `;
+
+    const body = `
+      <div class="space-y-4">
+        <div class="bg-blue-50 p-3 rounded-xl border border-blue-100 text-sm text-blue-800">
+          กรุณาจับคู่คอลัมน์จากไฟล์ CSV ให้ตรงกับช่องคะแนนในระบบ <br>
+          <span class="text-xs text-blue-600">(ระบบจะอ้างอิง "เลขที่" จากคอลัมน์แรกสุดของ CSV เสมอ)</span>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+          ${fields.map(f => `
+            <div class="flex items-center justify-between gap-2 border-b border-gray-100 pb-2">
+              <span class="text-sm font-medium text-gray-700 whitespace-nowrap">${f.label}</span>
+              <div class="w-32 sm:w-40">${makeSelect(f.id)}</div>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="pt-2 border-t border-gray-200">
+          <label class="block text-xs font-semibold text-gray-600 mb-1">ข้อมูลเริ่มที่บรรทัด (เผื่อมี Header หลายบรรทัด)</label>
+          <input type="number" id="csv-data-row" value="2" min="1" class="w-24 px-3 py-2 rounded-xl border border-gray-200 text-sm">
+        </div>
+      </div>
+    `;
+
+    const footer = `
+      <button id="btn-cancel-csv" class="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition">ยกเลิก</button>
+      <button id="btn-confirm-csv" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition shadow-sm">นำเข้าข้อมูล</button>
+    `;
+
+    openModal('จับคู่คอลัมน์ CSV', body, footer);
+
+    document.getElementById('btn-cancel-csv').onclick = closeModal;
+    document.getElementById('btn-confirm-csv').onclick = () => {
+      const dataRow = parseInt(document.getElementById('csv-data-row').value) || 2;
+      let parsed;
+      try {
+        parsed = parseScoreCSV(rawCsvText, 1, dataRow);
+      } catch (err) {
+        showToast(err.message, 'error');
+        return;
+      }
+
+      const mapEls = document.querySelectorAll('[data-map-field]');
+      const mapping = {};
+      let hasMapped = false;
+      mapEls.forEach(el => {
+        if (el.value !== '') {
+          mapping[el.dataset.mapField] = parseInt(el.value);
+          hasMapped = true;
+        }
+      });
+
+      if (!hasMapped) {
+        showToast('กรุณาเลือกอย่างน้อย 1 คอลัมน์ที่จะนำเข้า', 'warning');
+        return;
+      }
+
+      let appliedCount = 0;
+      parsed.data.forEach(row => {
+        const studentNumber = parseInt(row[0]);
+        if (!studentNumber || isNaN(studentNumber)) return;
+
+        const stu = students.find(s => parseInt(s.number) === studentNumber);
+        if (!stu) return;
+
+        const tr = document.querySelector(`tr[data-row-sid="${stu.id}"]`);
+        if (!tr) return;
+
+        let rowUpdated = false;
+        Object.entries(mapping).forEach(([field, colIdx]) => {
+          const val = row[colIdx];
+          if (val !== undefined && val !== '') {
+            const inp = tr.querySelector(`input[data-field="${field}"]`);
+            if (inp) {
+              inp.value = val;
+              if (parseFloat(val) > parseFloat(inp.max||0)) {
+                inp.classList.add('border-red-500', 'bg-red-50', 'text-red-700');
+              } else {
+                inp.classList.remove('border-red-500', 'bg-red-50', 'text-red-700');
+              }
+              rowUpdated = true;
+            }
+          }
+        });
+
+        if (rowUpdated) {
+          recalcRow(stu.id);
+          appliedCount++;
+        }
+      });
+
+      closeModal();
+      showToast(`นำเข้าคะแนนสำเร็จ ${appliedCount} คน (อย่าลืมกด "บันทึกทั้งหมด")`, 'success');
+    };
   }
 
   function recalcRow(sid) {
