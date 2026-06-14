@@ -308,7 +308,6 @@ export async function renderPp5ReportPage(container, userData) {
       }
 
       const renderCell = (val) => val !== undefined && val !== '' && val !== null ? val : '';
-
       return `
         <tr>
           <td>${stu.number}</td>
@@ -332,30 +331,12 @@ export async function renderPp5ReportPage(container, userData) {
       return sc.grade;
     }).filter(g => g !== undefined && g !== null && g !== '-' && g !== '');
 
-    // Helper to calculate Mode (ฐานนิยม)
-    const calculateMode = (arr) => {
-      if (arr.length === 0 || !hasAnyScores) return '';
-      const counts = {};
-      let maxCount = 0;
-      let mode = '';
-      const gradeWeights = { '4': 8, '3.5': 7, '3': 6, '2.5': 5, '2': 4, '1.5': 3, '1': 2, '0': 1 };
-      const getWeight = (g) => gradeWeights[g] || 0;
-      
-      for (const val of arr) {
-        counts[val] = (counts[val] || 0) + 1;
-        if (counts[val] > maxCount) {
-          maxCount = counts[val];
-          mode = val;
-        } else if (counts[val] === maxCount) {
-          if (getWeight(val) > getWeight(mode)) {
-            mode = val;
-          }
-        }
-      }
-      return mode;
-    };
+    // Calculate Average Grade (เฉลี่ยเกรด)
+    const validGrades = gradesArray.map(g => parseFloat(g)).filter(g => !isNaN(g));
+    const gradeSum = validGrades.reduce((sum, val) => sum + val, 0);
+    const gradeCount = validGrades.length;
+    const avgGrade = gradeCount > 0 && hasAnyScores ? (gradeSum / gradeCount).toFixed(2) : '';
 
-    const gradeMode = calculateMode(gradesArray);
     const avg = (sum) => {
       if (!hasAnyScores) return '';
       return count > 0 ? (sum / count).toFixed(2) : '';
@@ -407,7 +388,7 @@ export async function renderPp5ReportPage(container, userData) {
         </tbody>
         <tfoot>
           <tr class="font-semibold">
-            <td colspan="3" class="text-right pr-2" style="border-right: none !important;">คะแนนเฉลี่ย/ฐานนิยม</td>
+            <td colspan="3" class="text-right pr-2" style="border-right: none !important;">คะแนนเฉลี่ย</td>
             <td style="border-left: none !important;"></td>
             <td></td><td></td><td></td><td></td>
             <td></td>
@@ -415,7 +396,7 @@ export async function renderPp5ReportPage(container, userData) {
             <td></td>
             <td></td>
             <td class="font-bold">${avg(sums.total)}</td>
-            <td class="font-bold">${gradeMode}</td>
+            <td class="font-bold">${avgGrade}</td>
           </tr>
         </tfoot>
       </table>
