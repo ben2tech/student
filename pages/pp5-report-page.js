@@ -14,9 +14,12 @@ export async function renderPp5ReportPage(container, userData) {
 
   container.innerHTML = `
     <style id="pp5-print-style">
+      @import url('https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+      @import url('https://cdn.jsdelivr.net/npm/font-th-sarabun-new@1.0.0/css/th-sarabun-new.min.css');
+
       /* Screen Styles */
       #pp5-preview { 
-        font-family: 'Sarabun', 'TH SarabunPSK', sans-serif;
+        font-family: 'THSarabunNew', 'Sarabun', 'TH Sarabun New', 'TH SarabunPSK', sans-serif;
         background: white;
         color: black;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -74,7 +77,7 @@ export async function renderPp5ReportPage(container, userData) {
         }
         
         #pp5-preview { 
-          font-family: 'Sarabun', 'TH SarabunPSK', serif, sans-serif !important;
+          font-family: 'THSarabunNew', 'Sarabun', 'TH Sarabun New', 'TH SarabunPSK', serif, sans-serif !important;
           font-size: 9px !important; 
           color: black !important;
           width: 100% !important;
@@ -370,34 +373,29 @@ export async function renderPp5ReportPage(container, userData) {
         </colgroup>
         <thead>
           <tr>
-            <th rowspan="2">เลขที่</th>
-            <th rowspan="2">เลข<br>ประจำตัว</th>
-            <th rowspan="2" style="border-right: none !important;">ชื่อ-สกุล</th>
-            <th rowspan="2" style="border-left: none !important;">คะ<br>แนน</th>
+            <th rowspan="3">เลขที่</th>
+            <th rowspan="3">เลข<br>ประจำตัว</th>
+            <th rowspan="3" style="border-right: none !important;">ชื่อ-สกุล</th>
+            <th rowspan="3" style="border-left: none !important;">คะ<br>แนน</th>
             <th colspan="4">ก่อนกลางภาค</th>
             <th rowspan="2">กลาง<br>ภาค</th>
             <th colspan="4">หลังกลางภาค</th>
             <th rowspan="2">รวม</th>
             <th rowspan="2">ปลาย<br>ภาค</th>
             <th rowspan="2">รวม</th>
-            <th rowspan="2">เกรด</th>
+            <th rowspan="3">เกรด</th>
           </tr>
           <tr>
             <th>K</th><th>P</th><th>A</th><th>รวม</th>
             <th>K</th><th>P</th><th>A</th><th>รวม</th>
           </tr>
           <tr class="font-normal text-[9px] bg-gray-50/50">
-            <td style="border-right: none !important;"></td>
-            <td style="border-left: none !important; border-right: none !important;"></td>
-            <td style="border-left: none !important; border-right: none !important;"></td>
-            <td style="border-left: none !important;"></td>
             <td>${b.K||0}</td><td>${b.P||0}</td><td>${b.A||0}</td><td class="font-semibold">${beforeSum}</td>
             <td>${template.midterm||0}</td>
             <td>${a.K||0}</td><td>${a.P||0}</td><td>${a.A||0}</td><td class="font-semibold">${afterSum}</td>
             <td class="font-semibold">${beforeSum + midMax + afterSum}</td>
             <td>${template.final||0}</td>
             <td class="font-semibold">100</td>
-            <td></td>
           </tr>
         </thead>
         <tbody>
