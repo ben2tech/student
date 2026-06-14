@@ -29,7 +29,7 @@ export async function renderPp5ReportPage(container, userData) {
       #pp5-preview table { 
         width: 100%; 
         border-collapse: collapse; 
-        table-layout: fixed;
+        table-layout: auto;
       }
       #pp5-preview th, #pp5-preview td { 
         border: 1px solid black !important; 
@@ -88,7 +88,7 @@ export async function renderPp5ReportPage(container, userData) {
         #pp5-preview table { 
           width: 100% !important; 
           border-collapse: collapse !important; 
-          table-layout: fixed !important;
+          table-layout: auto !important;
         }
         
         #pp5-preview th, #pp5-preview td { 
@@ -280,6 +280,9 @@ export async function renderPp5ReportPage(container, userData) {
     };
     let count = students.length;
 
+    // Check if there are any scores entered in the class
+    const hasAnyScores = scores.some(sc => sc.totalScore !== undefined && sc.totalScore !== null && sc.totalScore !== '');
+
     const rowsHtml = students.map(stu => {
       const sc = scores.find(s => s.studentId === stu.id) || {};
       const sb = sc.beforeMidterm || {};
@@ -291,31 +294,33 @@ export async function renderPp5ReportPage(container, userData) {
       const mid = v(sc.midterm);
       const aK = v(sa.K); const aP = v(sa.P); const aA = v(sa.A); const aT = v(sa.T);
       const fin = v(sc.final);
-      const totalBefore = hasScores ? (bK + bP + bA + bT + mid + aK + aP + aA + aT) : 0;
-      const total = v(sc.totalScore);
-      const grade = sc.grade || '-';
+      const totalBefore = hasScores ? (bK + bP + bA + bT + mid + aK + aP + aA + aT) : '';
+      const total = hasScores ? v(sc.totalScore) : '';
+      const grade = sc.grade && sc.grade !== '-' ? sc.grade : '';
 
       sums.bK += bK; sums.bP += bP; sums.bA += bA; sums.bT += bT;
       sums.mid += mid;
       sums.aK += aK; sums.aP += aP; sums.aA += aA; sums.aT += aT;
       sums.fin += fin;
-      sums.totalBefore += totalBefore;
-      sums.total += total;
+      if (hasScores) {
+        sums.totalBefore += totalBefore;
+        sums.total += total;
+      }
 
-      const p = (val) => !hasScores ? '-' : val;
+      const renderCell = (val) => val !== undefined && val !== '' && val !== null ? val : '';
 
       return `
         <tr>
           <td>${stu.number}</td>
           <td>${stu.studentCode}</td>
-          <td class="text-left whitespace-nowrap">${stu.firstName} ${stu.lastName}</td>
-          <td></td> <!-- คอลัมน์คะแนนเปล่า -->
-          <td>${p(bK)}</td><td>${p(bP)}</td><td>${p(bA)}</td><td>${p(bT)}</td>
-          <td>${p(mid)}</td>
-          <td>${p(aK)}</td><td>${p(aP)}</td><td>${p(aA)}</td><td>${p(aT)}</td>
-          <td>${p(totalBefore)}</td>
-          <td>${p(fin)}</td>
-          <td class="font-bold">${p(total)}</td>
+          <td class="text-left whitespace-nowrap" style="border-right: none !important;">${stu.firstName} ${stu.lastName}</td>
+          <td style="border-left: none !important;"></td> <!-- คอลัมน์คะแนนเปล่า -->
+          <td>${renderCell(sb.K)}</td><td>${renderCell(sb.P)}</td><td>${renderCell(sb.A)}</td><td>${renderCell(sb.T)}</td>
+          <td>${renderCell(sc.midterm)}</td>
+          <td>${renderCell(sa.K)}</td><td>${renderCell(sa.P)}</td><td>${renderCell(sa.A)}</td><td>${renderCell(sa.T)}</td>
+          <td>${renderCell(totalBefore)}</td>
+          <td>${renderCell(sc.final)}</td>
+          <td class="font-bold">${renderCell(total)}</td>
           <td class="font-bold">${grade}</td>
         </tr>
       `;
@@ -329,10 +334,10 @@ export async function renderPp5ReportPage(container, userData) {
 
     // Helper to calculate Mode (ฐานนิยม)
     const calculateMode = (arr) => {
-      if (arr.length === 0) return '-';
+      if (arr.length === 0 || !hasAnyScores) return '';
       const counts = {};
       let maxCount = 0;
-      let mode = '-';
+      let mode = '';
       const gradeWeights = { '4': 8, '3.5': 7, '3': 6, '2.5': 5, '2': 4, '1.5': 3, '1': 2, '0': 1 };
       const getWeight = (g) => gradeWeights[g] || 0;
       
@@ -351,14 +356,17 @@ export async function renderPp5ReportPage(container, userData) {
     };
 
     const gradeMode = calculateMode(gradesArray);
-    const avg = (sum) => count > 0 ? (sum / count).toFixed(2) : '-';
+    const avg = (sum) => {
+      if (!hasAnyScores) return '';
+      return count > 0 ? (sum / count).toFixed(2) : '';
+    };
 
     const tableHtml = `
       <table>
         <colgroup>
           <col style="width: 4%;">
           <col style="width: 8%;">
-          <col style="width: 27%;">
+          <col>
           <col style="width: 4%;">
           <col style="width: 4%;">
           <col style="width: 4%;">
@@ -378,8 +386,8 @@ export async function renderPp5ReportPage(container, userData) {
           <tr>
             <th rowspan="2">เลขที่</th>
             <th rowspan="2">เลข<br>ประจำตัว</th>
-            <th rowspan="2">ชื่อ-สกุล</th>
-            <th rowspan="2">คะ<br>แนน</th>
+            <th rowspan="2" style="border-right: none !important;">ชื่อ-สกุล</th>
+            <th rowspan="2" style="border-left: none !important;">คะ<br>แนน</th>
             <th colspan="4">ก่อนกลางภาค</th>
             <th rowspan="2">กลาง<br>ภาค</th>
             <th colspan="4">หลังกลางภาค</th>
@@ -399,8 +407,8 @@ export async function renderPp5ReportPage(container, userData) {
         </tbody>
         <tfoot>
           <tr class="font-semibold">
-            <td colspan="3" class="text-right pr-2">คะแนนเฉลี่ย/ฐานนิยม</td>
-            <td></td>
+            <td colspan="3" class="text-right pr-2" style="border-right: none !important;">คะแนนเฉลี่ย/ฐานนิยม</td>
+            <td style="border-left: none !important;"></td>
             <td></td><td></td><td></td><td></td>
             <td></td>
             <td></td><td></td><td></td><td></td>
