@@ -12,22 +12,33 @@ import { showToast, spinnerHTML, emptyHTML } from '../modules/utils.js';
 export async function renderPp5ReportPage(container, userData) {
   const currentYear = new Date().getFullYear() + 543;
 
-  // Print CSS injected if not exists
-  if (!document.getElementById('pp5-print-style')) {
-    const style = document.createElement('style');
-    style.id = 'pp5-print-style';
-    style.innerHTML = `
+  container.innerHTML = `
+    <style id="pp5-print-style">
       @media print {
-        body > *:not(#layout-app) { display: none !important; }
-        #layout-app > aside { display: none !important; }
-        #layout-app > div > header { display: none !important; }
-        .no-print { display: none !important; }
+        html, body {
+          background: white !important;
+          color: black !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          height: auto !important;
+          min-height: auto !important;
+          overflow: visible !important;
+        }
         
-        #layout-app, #layout-app > div, #app-content { 
+        /* ซ่อนส่วนประกอบที่ไม่ต้องการพิมพ์ */
+        aside, header, #sidebar-overlay, .no-print {
+          display: none !important;
+        }
+        
+        #layout-app, #layout-app > div.flex-1, #app-content { 
           display: block !important; 
           padding: 0 !important; 
           margin: 0 !important;
           background: white !important;
+          border: none !important;
+          box-shadow: none !important;
+          width: 100% !important;
+          max-width: 100% !important;
         }
         
         @page { 
@@ -58,7 +69,7 @@ export async function renderPp5ReportPage(container, userData) {
         
         #pp5-preview .text-left { text-align: left !important; }
         
-        /* Remove background colors and badges for print */
+        /* เอาสีพื้นหลังและสี Badge ออกเมื่อพิมพ์ */
         #pp5-preview .bg-emerald-100, #pp5-preview .bg-teal-100, 
         #pp5-preview .bg-cyan-100, #pp5-preview .bg-blue-100, 
         #pp5-preview .bg-amber-100, #pp5-preview .bg-orange-100, 
@@ -68,11 +79,8 @@ export async function renderPp5ReportPage(container, userData) {
           color: black !important;
         }
       }
-    `;
-    document.head.appendChild(style);
-  }
+    </style>
 
-  container.innerHTML = `
     <div class="space-y-6">
       <div class="no-print">
         <h1 class="text-2xl font-bold text-gray-800">พิมพ์ ปพ.5</h1>
