@@ -347,7 +347,7 @@ export async function renderPp5ReportPage(container, userData) {
         <colgroup>
           <col style="width: 4%;">
           <col style="width: 8%;">
-          <col>
+          <col style="width: 1px;">
           <col style="width: 4%;">
           <col style="width: 4%;">
           <col style="width: 4%;">
