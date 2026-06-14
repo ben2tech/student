@@ -2,7 +2,7 @@
 import { loginUser, logoutUser, getUserData, onAuthStateChange, loginWithGoogle, hasRole } from './modules/auth.js';
 import { showToast } from './modules/utils.js';
 import { renderDashboard } from './pages/dashboard.js';
-import { renderStudentsPage } from './pages/students-page.js';
+import { renderStudentsPage } from './pages/students-page.js?v=1.4';
 import { renderAttendancePage } from './pages/attendance-page.js';
 import { renderBehaviorPage } from './pages/behavior-page.js';
 import { renderBehaviorCriteriaPage } from './pages/behavior-criteria-page.js';

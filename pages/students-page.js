@@ -1,7 +1,7 @@
 // pages/students-page.js — Student Management Page
 import { getStudents, addStudent, updateStudent, deleteStudent, promoteStudents, parseStudentCSV, importStudentsFromCSV, downloadStudentCSVTemplate, uploadStudentPhoto } from '../modules/students.js';
 import { getStudentBehaviorScore } from '../modules/behavior.js';
-import { showToast, showConfirm, openModal, closeModal, formatThaiDate, classSelectOptions, spinnerHTML, emptyHTML, compressImage } from '../modules/utils.js';
+import { showToast, showConfirm, openModal, closeModal, formatThaiDate, classSelectOptions, spinnerHTML, emptyHTML, compressImage } from '../modules/utils.js?v=1.4';
 import { currentUser, hasRole } from '../modules/auth.js';
 import { getClassrooms } from '../modules/classes.js';
 
