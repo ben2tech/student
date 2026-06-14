@@ -313,7 +313,7 @@ export async function renderPp5ReportPage(container, userData) {
         <tr>
           <td>${stu.number}</td>
           <td>${stu.studentCode}</td>
-          <td class="text-left whitespace-nowrap" style="border-right: none !important;">${stu.firstName} ${stu.lastName}</td>
+          <td class="text-left whitespace-nowrap" style="border-right: none !important;">${stu.prefix || ''}${stu.firstName} ${stu.lastName}</td>
           <td style="border-left: none !important;"></td> <!-- คอลัมน์คะแนนเปล่า -->
           <td>${renderCell(sb.K)}</td><td>${renderCell(sb.P)}</td><td>${renderCell(sb.A)}</td><td>${renderCell(sb.T)}</td>
           <td>${renderCell(sc.midterm)}</td>
