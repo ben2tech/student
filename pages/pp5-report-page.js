@@ -279,7 +279,6 @@ export async function renderPp5ReportPage(container, userData) {
       aK:0, aP:0, aA:0, aT:0, fin:0, totalBefore:0, total:0
     };
     let count = students.length;
-    let gradeCounts = { '4':0, '3.5':0, '3':0, '2.5':0, '2':0, '1.5':0, '1':0, '0':0 };
 
     const rowsHtml = students.map(stu => {
       const sc = scores.find(s => s.studentId === stu.id) || {};
@@ -303,10 +302,6 @@ export async function renderPp5ReportPage(container, userData) {
       sums.totalBefore += totalBefore;
       sums.total += total;
 
-      if (grade !== '-' && gradeCounts[grade] !== undefined) {
-        gradeCounts[grade]++;
-      }
-
       const p = (val) => !hasScores ? '-' : val;
 
       return `
@@ -326,6 +321,35 @@ export async function renderPp5ReportPage(container, userData) {
       `;
     }).join('');
 
+    // Extract all valid grades
+    const gradesArray = students.map(stu => {
+      const sc = scores.find(s => s.studentId === stu.id) || {};
+      return sc.grade;
+    }).filter(g => g !== undefined && g !== null && g !== '-' && g !== '');
+
+    // Helper to calculate Mode (ฐานนิยม)
+    const calculateMode = (arr) => {
+      if (arr.length === 0) return '-';
+      const counts = {};
+      let maxCount = 0;
+      let mode = '-';
+      const gradeWeights = { '4': 8, '3.5': 7, '3': 6, '2.5': 5, '2': 4, '1.5': 3, '1': 2, '0': 1 };
+      
+      for (const val of arr) {
+        counts[val] = (counts[val] || 0) + 1;
+        if (counts[val] > maxCount) {
+          maxCount = counts[val];
+          mode = val;
+        } else if (counts[val] === maxCount) {
+          if (gradeWeights[val] > gradeWeights[mode]) {
+            mode = val;
+          }
+        }
+      }
+      return mode;
+    };
+
+    const gradeMode = calculateMode(gradesArray);
     const avg = (sum) => count > 0 ? (sum / count).toFixed(2) : '-';
 
     const tableHtml = `
@@ -374,32 +398,18 @@ export async function renderPp5ReportPage(container, userData) {
         </tbody>
         <tfoot>
           <tr class="font-semibold">
-            <td colspan="3" class="text-right pr-2">คะแนนเฉลี่ย</td>
+            <td colspan="3" class="text-right pr-2">คะแนนเฉลี่ย/ฐานนิยม</td>
             <td></td>
-            <td>${avg(sums.bK)}</td><td>${avg(sums.bP)}</td><td>${avg(sums.bA)}</td><td>${avg(sums.bT)}</td>
-            <td>${avg(sums.mid)}</td>
-            <td>${avg(sums.aK)}</td><td>${avg(sums.aP)}</td><td>${avg(sums.aA)}</td><td>${avg(sums.aT)}</td>
+            <td></td><td></td><td></td><td></td>
+            <td></td>
+            <td></td><td></td><td></td><td></td>
             <td>${avg(sums.totalBefore)}</td>
-            <td>${avg(sums.fin)}</td>
+            <td></td>
             <td class="font-bold">${avg(sums.total)}</td>
-            <td>-</td>
+            <td class="font-bold">${gradeMode}</td>
           </tr>
         </tfoot>
       </table>
-    `;
-
-    // Summary box
-    let summaryHtml = '<div class="flex flex-wrap gap-x-4 gap-y-1 mb-2">';
-    ['4', '3.5', '3', '2.5', '2', '1.5', '1', '0'].forEach(g => {
-      summaryHtml += `<div>เกรด ${g}: <span class="font-bold">${gradeCounts[g]}</span> คน</div>`;
-    });
-    summaryHtml += '</div>';
-    
-    summaryHtml += `
-      <div class="mt-2 text-gray-700">
-        จำนวนนักเรียนทั้งหมด: <span class="font-bold">${count}</span> คน &nbsp;&nbsp;|&nbsp;&nbsp; 
-        คะแนนเฉลี่ยรายวิชา: <span class="font-bold">${avg(sums.total)}</span>
-      </div>
     `;
 
     previewContainer.innerHTML = `
@@ -416,22 +426,6 @@ export async function renderPp5ReportPage(container, userData) {
         </div>
  
         ${tableHtml}
- 
-        <div class="mt-6 border border-black p-3 rounded bg-gray-50/50 text-xs">
-          <div class="font-bold mb-1.5 underline">สรุปผลการเรียน</div>
-          ${summaryHtml}
-        </div>
-        
-        <div class="mt-10 flex justify-around text-xs text-center">
-          <div>
-            <div>ลงชื่อ .............................................................. ครูผู้สอน</div>
-            <div class="mt-1.5">( .............................................................. )</div>
-          </div>
-          <div>
-            <div>ลงชื่อ .............................................................. หัวหน้ากลุ่มสาระฯ</div>
-            <div class="mt-1.5">( .............................................................. )</div>
-          </div>
-        </div>
  
       </div>
     `;
