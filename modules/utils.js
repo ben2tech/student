@@ -189,7 +189,7 @@ export function emptyHTML(msg = 'ไม่มีข้อมูล') {
  * @param {number} options.quality
  * @returns {Promise<{compressedFile: File, dataUrl: string}>}
  */
-export function compressImage(file, { maxWidth = 400, maxHeight = 400, quality = 0.7 } = {}) {
+export function compressImage(file, { maxWidth = 800, maxHeight = 800, quality = 0.85 } = {}) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
